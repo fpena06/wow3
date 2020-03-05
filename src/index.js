@@ -18,7 +18,7 @@ app.use(function(req, res, next) {
 app.disable("x-powered-by");
 app.use(express.json());
 mongoose.connect(
-  "mongodb://nikhil:nikhil1@ds227858.mlab.com:27858/wow3/wows3",
+  "mongodb://nikhil:nikhil1@ds227858.mlab.com:27858/wow3",
   {
     useFindAndModify: false,
     useCreateIndex: true,
