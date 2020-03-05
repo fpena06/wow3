@@ -1,9 +1,9 @@
 let jwt = require("jsonwebtoken");
-
+const config = require("config");
 exports.checkToken = async (req, res, next) => {
   let token = req.headers["x-access-token"] || req.headers["authorization"]; // Express headers are auto converted to lowercase
   if (token) {
-    jwt.verify(token, "TokyoGhoul", (err, decoded) => {
+    jwt.verify(token, config.get("TOKEN"), (err, decoded) => {
       if (err) {
         return res.json({
           success: false,

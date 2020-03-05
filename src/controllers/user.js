@@ -1,5 +1,6 @@
 let { User, userValidation, Company, Transaction } = require("../models");
 const mongoose = require("mongoose");
+const config = require("config");
 const jwt = require("jsonwebtoken");
 
 // add user
@@ -44,7 +45,7 @@ exports.login = async (req, res) => {
     if (req.body.password === user.password) {
       let token = await jwt.sign(
         { mobile: req.body.mobile, password: req.body.password },
-        "TokyoGhoul"
+        config.get("TOKEN")
       );
       res.header("x-auth-token", token).send("Suceefully logged in ...");
     }
