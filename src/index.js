@@ -39,6 +39,7 @@ app.get("/", (req, res) => {
 });
 app.use("/user", routes.user);
 app.use("/admin", routes.admin);
-app.listen(3000, "localhost", err => {
+let port = process.env.PORT || 3000;
+app.listen(port, "localhost", err => {
   if (err) console.log(err);
 });
