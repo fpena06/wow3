@@ -4,8 +4,17 @@ require("dotenv").config();
 const routes = require("./routes");
 const config = require("config");
 const app = express();
-app;
+// app;
+var server = require("http").Server(app);
+var io = require("socket.io")(server);
 
+app.use(function(req, res, next) {
+  io.on("connection", socket => {
+    console.log("I am Connected");
+  });
+  res.io = io;
+  next();
+});
 app.disable("x-powered-by");
 app.use(express.json());
 mongoose.connect(

@@ -27,6 +27,10 @@ router.get(
   User.dashboardCategory
 );
 
+// asdfghjkl
+router.get("/asdf", (req, res) => {
+  res.io.emit("tweet", { id: "1", text: "Heloo" });
+});
 //user leaderboard
 
 router.get("/leaderboard", Auth.auth.checkToken, User.leaderboard);

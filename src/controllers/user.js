@@ -108,8 +108,11 @@ exports.transaction = async (req, res) => {
   const userTransaction = await Transaction.find({
     userID: req.body.User_id
   });
-  console.log(userTransaction);
-  return res.send(userTransaction);
+  const user = await User.find({
+    _id: req.body.User_id
+  });
+  userCurrentHoldings = user.currentHoldings;
+  return res.send({ userTransaction, userCurrentHoldings });
 };
 
 //buy shares
