@@ -47,7 +47,9 @@ exports.login = async (req, res) => {
         { mobile: req.body.mobile, password: req.body.password },
         config.get("TOKEN")
       );
-      res.header("x-auth-token", token).send("Suceefully logged in ...");
+      res
+        .header("x-auth-token", token)
+        .send({ message: "Suceefully logged in ...", user });
     }
   }
 };
@@ -73,23 +75,46 @@ exports.dashboard = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile
   });
-  const totalAmount = user.walletAmount;
-  const grossingCompany = await Company.findOne()
-    .sort("shareValue: 1")
+  const userWalletAmount = user.walletAmount;
+  const grossingCompany = await Company.find()
+    .sort({ shareValue: -1 })
     .limit(1)
     .select("name");
-  const leaderboardTop = await User.findOne()
-    .sort("walletAmount: 1")
+  let userShareAmount = 0;
+  for (let i = 0; i < user.currentHoldings.length; i++) {
+    userShareAmount = userShareAmount + user.currentHoldings[i].shareAmount;
+  }
+  const leaderboardTop = await User.find()
+    .sort({ walletAmount: -1 })
     .limit(1)
-    .select("name");
-  return res.send({ totalAmount, grossingCompany, leaderboardTop });
+    .select(["name", "walletAmount"]);
+  const category = await Company.aggregate([
+    {
+      $group: {
+        _id: "$category",
+        total: { $sum: 0 }
+      }
+    },
+    {
+      $project: {
+        category: "$_id",
+        _id: 0
+      }
+    }
+  ]);
+  return res.send({
+    userShareAmount,
+    userWalletAmount,
+    grossingCompany,
+    leaderboardTop,
+    category
+  });
 };
-
 //user dashboard after selecting category
 
 exports.dashboardCategory = async (req, res) => {
   const companyCategory = await Company.find({
-    category: req.params.category
+    category: req.body.category
   }).select(["name", "shareValue", "shareCount"]);
   return res.send(companyCategory);
 };
@@ -98,7 +123,7 @@ exports.dashboardCategory = async (req, res) => {
 
 exports.leaderboard = async (req, res) => {
   const leaderboardUsers = await User.find()
-    .sort("walletAmount:1")
+    .sort({ walletAmount: -1 })
     .select(["name", "walletAmount"]);
   return res.send(leaderboardUsers);
 };
@@ -109,10 +134,10 @@ exports.transaction = async (req, res) => {
   const userTransaction = await Transaction.find({
     userID: req.body.User_id
   });
-  const user = await User.find({
+  const user = await User.findOne({
     _id: req.body.User_id
   });
-  userCurrentHoldings = user.currentHoldings;
+  const userCurrentHoldings = await user.currentHoldings;
   return res.send({ userTransaction, userCurrentHoldings });
 };
 

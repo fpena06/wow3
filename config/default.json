@@ -1,4 +1,4 @@
 {
   "TOKEN": "TokyoGhoul",
-  "DBURL": "mongodb://nikhil:nikhil1@ds227858.mlab.com:27858/wow3"
+  "DBURL": "mongodb://localhost/wows3"
 }
