@@ -71,6 +71,14 @@ exports.changePassword = async (req, res) => {
 
 //user dashboard
 
+exports.dashboardSocket = async data => {
+  console.log(data.mobile);
+  const user = await User.findOne({
+    mobile: data.mobile
+  });
+  return user;
+};
+
 exports.dashboard = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile
@@ -88,26 +96,11 @@ exports.dashboard = async (req, res) => {
     .sort({ walletAmount: -1 })
     .limit(1)
     .select(["name", "walletAmount"]);
-  const category = await Company.aggregate([
-    {
-      $group: {
-        _id: "$category",
-        total: { $sum: 0 }
-      }
-    },
-    {
-      $project: {
-        category: "$_id",
-        _id: 0
-      }
-    }
-  ]);
   return res.send({
     userShareAmount,
     userWalletAmount,
     grossingCompany,
-    leaderboardTop,
-    category
+    leaderboardTop
   });
 };
 //user dashboard after selecting category
@@ -144,6 +137,7 @@ exports.transaction = async (req, res) => {
 //buy shares
 
 exports.buyShares = async (req, res) => {
+  let changedUser;
   const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
   const shareAmount = company.shareValue * req.body.shareCount;
@@ -226,6 +220,28 @@ exports.buyShares = async (req, res) => {
     shareAmount: company.shareValue * req.body.shareCount
   });
   await transaction.save();
+  const grossingCompany = await Company.find()
+    .sort({ shareValue: -1 })
+    .limit(1)
+    .select("name");
+  const leaderboardTop = await User.find()
+    .sort({ walletAmount: -1 })
+    .limit(1)
+    .select(["name", "walletAmount"]);
+  const global = {
+    leaderboardTop,
+    grossingCompany
+  };
+  console.log(leaderboardTop);
+  await res.io.emit("global", { global: global, type: "stat" });
+  changedUser = await User.findById(req.body.User_id).select([
+    "walletAmount",
+    "mobile",
+    "currentHoldings"
+  ]);
+  // changedCompany =  await Company.findById(req.body.Company_id)
+  await res.io.emit("user", { user: changedUser, type: "stat" });
+  console.log(changedUser);
   res.send({ message: "Shares bought sucessfully..." });
 };
 
@@ -310,5 +326,25 @@ exports.sellShares = async (req, res) => {
     shareAmount: company.shareValue * req.body.shareCount
   });
   await transaction.save();
+  const grossingCompany = await Company.find()
+    .sort({ shareValue: -1 })
+    .limit(1)
+    .select("name");
+  const leaderboardTop = await User.find()
+    .sort({ walletAmount: -1 })
+    .limit(1)
+    .select(["name", "walletAmount"]);
+  const global = {
+    leaderboardTop,
+    grossingCompany
+  };
+  await res.io.emit("global", { global: global, type: "stat" });
+  changedUser = await User.findById(req.body.User_id).select([
+    "walletAmount",
+    "mobile",
+    "currentHoldings"
+  ]);
+  await res.io.emit("user", { user: changedUser, type: "stat" });
+  console.log(changedUser);
   res.send({ message: "Shares Sold Successfully" });
 };

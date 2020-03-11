@@ -1,20 +1,37 @@
 const express = require("express");
 const mongoose = require("mongoose");
-// require("dotenv").config();
+require("dotenv").config();
 const routes = require("./routes");
 const config = require("config");
 const app = express();
 const socketIo = require("socket.io");
 const http = require("http");
+const cors = require("cors");
+
+// Socket
 
 const server = http.createServer(app);
-const io = socketIo(server);
-
+const io = socketIo(server, { transport: ["websocket"] });
+io.origins("*:*");
 io.on("connection", socket => {
   console.log(socket.handshake.address + " Connected");
-
+  socket.on("user", async data => {
+    console.log(data);
+    const user = await require("../src/controllers/user").dashboardSocket(data);
+    console.log(user);
+    io.emit("user", user);
+  });
   socket.on("disconnect", () => console.log("Client disconnected"));
 });
+
+// Express
+
+const corsOption = {
+  origin: true,
+  credentials: true,
+  exposedHeaders: "x-access-token"
+};
+app.use(cors(corsOption));
 
 app.use((req, res, next) => {
   res.io = io;
@@ -49,11 +66,11 @@ app.get("/", (req, res) => {
 app.use("/user", routes.user);
 app.use("/admin", routes.admin);
 
-let port1 = process.env.PORT || 3001;
+// let port1 = process.env.PORT || 3001;
 let port2 = process.env.PORT || 4001;
 
-app.listen(port1, "localhost", err => {
-  if (err) console.log("Error listening on the port: ", err);
-});
+// app.listen(port1, "localhost", err => {
+//   if (err) console.log("Error listening on the port: ", err);
+// });
 
 server.listen(port2, () => console.log(`Listening on port ${port2}`));

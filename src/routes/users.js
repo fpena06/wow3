@@ -17,7 +17,7 @@ router.post("/changePassword", Auth.auth.checkToken, User.changePassword);
 
 // user dashboard
 
-router.post("/dashboard", Auth.auth.checkToken, User.dashboard);
+router.post("/dashboard/stat", Auth.auth.checkToken, User.dashboard);
 
 // user dashboard after selecting category
 
