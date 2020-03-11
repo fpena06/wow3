@@ -33,18 +33,21 @@ exports.addCompany = async (req, res) => {
     console.log(error);
     return res.send("Error", error.details[0].message);
   }
-  company = new Company({
-    name: req.body.name,
-    category: req.body.category,
-    shareValue: req.body.shareValue,
-    currentHolders: [],
-    shareCount: req.body.shareCount,
-    previousValue: []
-  });
-  await company.save();
-  res.json({
-    message: "Company added sucessfully"
-  });
+  let company = await Company.findOne({ name: req.body.name });
+  if (!company) {
+    company = new Company({
+      name: req.body.name,
+      category: req.body.category,
+      shareValue: req.body.shareValue,
+      currentHolders: [],
+      shareCount: req.body.shareCount,
+      previousValue: []
+    });
+    await company.save();
+    res.json({
+      message: "Company added sucessfully"
+    });
+  } else return res.send({ message: "company already exist" });
 };
 
 // change company share value

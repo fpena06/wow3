@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const CompanySchema = mongoose.Schema({
-  name: String,
+  name: { type: String, unique: true },
   category: String,
   shareValue: Number,
   currentHolders: [
