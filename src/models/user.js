@@ -4,7 +4,7 @@ const UserSchema = mongoose.Schema({
   name: String,
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  mobile: { type: Number, required: true, unique: true },
+  mobile: { type: String, required: true, unique: true },
   walletAmount: { type: Number, default: 100000 },
   watchList: [{ type: mongoose.Schema.Types.ObjectId, ref: "Company" }],
   currentHoldings: [
@@ -24,9 +24,7 @@ function userValidation(User) {
       .required()
       .email(),
     password: Joi.string().required(),
-    mobile: Joi.number()
-      .integer()
-      .required()
+    mobile: Joi.string().required()
   });
   return Joi.validate(User, schema);
 }

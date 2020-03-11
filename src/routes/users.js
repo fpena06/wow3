@@ -43,4 +43,16 @@ router.post("/company/buyShares", Auth.auth.checkToken, User.buyShares);
 
 router.post("/company/sellShares", Auth.auth.checkToken, User.sellShares);
 
+// add company to watchList
+
+router.post("/addToWatchlist", Auth.auth.checkToken, User.addToWatchlist);
+
+// remove from watchlist
+
+router.post(
+  "/deleteFromWatchlist",
+  Auth.auth.checkToken,
+  User.removeFromWatchlist
+);
+
 module.exports = router;

@@ -16,7 +16,7 @@ io.origins("*:*");
 io.on("connection", socket => {
   console.log(socket.handshake.address + " Connected");
   socket.on("user", async data => {
-    console.log(data);
+    console.log("shreeji sent", data);
     const user = await require("../src/controllers/user").dashboardSocket(data);
     console.log(user);
     io.emit("user", user);

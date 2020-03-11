@@ -21,7 +21,6 @@ exports.updateCompanyShareValue = async (req, res) => {
     shareValue: req.body.shareValue
   });
   company = await Company.findById(req.body._id);
-  console.log(company);
   await res.io.emit("global", { company: company, type: "company" });
   res.send(company);
 };

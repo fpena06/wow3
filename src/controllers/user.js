@@ -47,10 +47,12 @@ exports.login = async (req, res) => {
         { mobile: req.body.mobile, password: req.body.password },
         config.get("TOKEN")
       );
-      res
-        .header("x-auth-token", token)
-        .send({ message: "Suceefully logged in ...", user });
-    }
+      res.send({
+        message: "Sucessfully logged in ...",
+        user: { mobile: user.mobile, name: user.name },
+        token
+      });
+    } else return res.send({ message: "incorrect password" });
   }
 };
 
@@ -69,7 +71,7 @@ exports.changePassword = async (req, res) => {
   console.log("password updated sucessfully");
 };
 
-//user dashboard
+//user dashboard stats
 
 exports.dashboardSocket = async data => {
   console.log(data.mobile);
@@ -79,6 +81,7 @@ exports.dashboardSocket = async data => {
   return user;
 };
 
+//user dashboard
 exports.dashboard = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile
@@ -103,12 +106,13 @@ exports.dashboard = async (req, res) => {
     leaderboardTop
   });
 };
+
 //user dashboard after selecting category
 
 exports.dashboardCategory = async (req, res) => {
   const companyCategory = await Company.find({
     category: req.body.category
-  }).select(["name", "shareValue", "shareCount"]);
+  }).select(["name", "shareValue", "shareCount", "previousValue"]);
   return res.send(companyCategory);
 };
 
@@ -239,8 +243,17 @@ exports.buyShares = async (req, res) => {
     "mobile",
     "currentHoldings"
   ]);
-  // changedCompany =  await Company.findById(req.body.Company_id)
   await res.io.emit("user", { user: changedUser, type: "stat" });
+  changedCompany = await Company.findById(req.body.Company_id).select([
+    "shareValue",
+    "shareCount",
+    "previousValue"
+  ]);
+  await res.io.emit("company", {
+    company: changedCompany,
+    type: "company stat"
+  });
+  console.log(changedCompany);
   console.log(changedUser);
   res.send({ message: "Shares bought sucessfully..." });
 };
@@ -345,6 +358,52 @@ exports.sellShares = async (req, res) => {
     "currentHoldings"
   ]);
   await res.io.emit("user", { user: changedUser, type: "stat" });
+  changedCompany = await Company.findById(req.body.Company_id).select([
+    "shareValue",
+    "shareCount",
+    "previousValue"
+  ]);
+  await res.io.emit("company", {
+    company: changedCompany,
+    type: "company stat"
+  });
   console.log(changedUser);
+  console.log(changedCompany);
   res.send({ message: "Shares Sold Successfully" });
+};
+
+// add to watchlist
+
+exports.addToWatchlist = async (req, res) => {
+  const user = await User.findOne({
+    mobile: req.body.mobile
+  });
+  const company = await Company.findById(req.body.Company_id);
+  await User.findByIdAndUpdate(user._id, {
+    watchList: [
+      ...user.watchList,
+      {
+        name: company.name,
+        shareValue: company.shareValue,
+        previousValue: company.previousValue
+      }
+    ]
+  });
+  res.send({ message: "added to watchlist sucessfully" });
+};
+
+// remove from watchlist
+
+exports.removeFromWatchlist = async (req, res) => {
+  const user = await User.findOne({
+    mobile: req.body.mobile
+  });
+  if (!user) return res.send({ message: "user not present in database..." });
+  let newWatchlist = user.watchList.filter(
+    p => p.name.toString() != req.body.Company_name.toString()
+  );
+  await User.findByIdAndUpdate(user._id, {
+    watchList: newWatchlist
+  });
+  res.send({ message: "removed from watchlist sucessfully" });
 };
