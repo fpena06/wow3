@@ -10,7 +10,7 @@ const UserSchema = mongoose.Schema({
     {
       name: { type: String },
       shareValue: { type: Number },
-      previousValue: { type: Array }
+      shareValuePercentage: { type: Number }
     }
   ],
   currentHoldings: [

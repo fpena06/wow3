@@ -360,16 +360,26 @@ exports.addToWatchlist = async (req, res) => {
     "shareValue",
     "previousValue"
   ]);
-  await User.findByIdAndUpdate(user._id, {
-    watchList: [
-      ...user.watchList,
-      {
-        name: company.name,
-        shareValue: Number(company.shareValue),
-        previousValue: company.previousValue
-      }
-    ]
+  let flag = 0;
+  user.watchList.forEach(p => {
+    if (p.name === company.name) flag = 1;
   });
+  if (flag === 0) {
+    const shareValueChange =
+      company.shareValue -
+      company.previousValue[company.previousValue.length - 1];
+    const shareValuePercentage = (shareValueChange / company.shareValue) * 100;
+    await User.findByIdAndUpdate(user._id, {
+      watchList: [
+        ...user.watchList,
+        {
+          name: company.name,
+          shareValue: company.shareValue,
+          shareValuePercentage
+        }
+      ]
+    });
+  } else return res.send("company already exist in watchlist");
   res.send({ message: "added to watchlist sucessfully" });
 };
 
