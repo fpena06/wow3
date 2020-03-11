@@ -10,6 +10,10 @@ router.post("/addUser", Admin.addUser);
 
 router.post("/login/admin", Admin.login);
 
+// add company
+
+router.post("/addCompany", Auth.auth.checkToken, Admin.addCompany);
+
 // update Company share value
 
 router.post(

@@ -2,6 +2,7 @@ let {
   Admin,
   User,
   Company,
+  companyValidation,
   userValidation,
   News,
   Transaction
@@ -22,6 +23,28 @@ exports.login = async (req, res) => {
       res.header("x-auth-token", token).send("Suceefully logged in ..."); // Token to be included after generation
     }
   }
+};
+
+// add company
+
+exports.addCompany = async (req, res) => {
+  let { error } = await companyValidation(req.body);
+  if (error) {
+    console.log(error);
+    return res.send("Error", error.details[0].message);
+  }
+  company = new Company({
+    name: req.body.name,
+    category: req.body.category,
+    shareValue: req.body.shareValue,
+    currentHolders: [],
+    shareCount: req.body.shareCount,
+    previousValue: []
+  });
+  await company.save();
+  res.json({
+    message: "Company added sucessfully"
+  });
 };
 
 // change company share value
