@@ -1,37 +1,7 @@
-let { User, userValidation, Company, Transaction } = require("../models");
+let { User, Company, Transaction, News } = require("../models");
 const mongoose = require("mongoose");
 const config = require("config");
 const jwt = require("jsonwebtoken");
-
-// add user
-
-exports.addUser = async (req, res) => {
-  let { error } = await userValidation(req.body);
-  if (error) {
-    console.log(error);
-    return res.send("Error", error.details[0].message);
-  }
-  let user = await User.findOne({
-    email: req.body.email,
-    mobile: req.body.mobile
-  });
-  if (user)
-    return res.json({
-      message: "User Already Exist..."
-    });
-  user = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    mobile: req.body.mobile,
-    watchList: [],
-    currentHoldings: []
-  });
-  await user.save();
-  res.json({
-    message: "User added sucessfully"
-  });
-};
 
 // user login
 
@@ -114,6 +84,13 @@ exports.dashboardCategory = async (req, res) => {
     category: req.body.category
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
   return res.send(companyCategory);
+};
+
+// news display
+
+exports.newsDisplay = async (req, res) => {
+  const news = await News.find();
+  res.send(news);
 };
 
 //user leaderboard

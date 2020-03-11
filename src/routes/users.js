@@ -2,11 +2,6 @@ const express = require("express");
 const User = require("../controllers/user");
 const Auth = require("../middleware/index");
 let router = express.Router();
-
-// add user
-
-router.post("/addUser", User.addUser);
-
 // login user
 
 router.post("/login/user", User.login);
@@ -26,6 +21,10 @@ router.post(
   Auth.auth.checkToken,
   User.dashboardCategory
 );
+
+// news section
+
+router.post("/news", Auth.auth.checkToken, User.newsDisplay);
 
 //user leaderboard
 
