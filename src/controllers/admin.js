@@ -1,4 +1,11 @@
-let { Admin, User, Company, userValidation, News } = require("../models");
+let {
+  Admin,
+  User,
+  Company,
+  userValidation,
+  News,
+  Transaction
+} = require("../models");
 
 // admin login
 
@@ -82,4 +89,23 @@ exports.addNews = async (req, res) => {
   });
   await news.save();
   res.send(news);
+};
+
+// leaderboard
+
+exports.leaderboard = async (req, res) => {
+  const leaderboardUsers = await User.find()
+    .sort({ walletAmount: -1 })
+    .select(["name", "walletAmount"]);
+  return res.send(leaderboardUsers);
+};
+
+// transaction
+
+exports.transaction = async (req, res) => {
+  const user = await User.findOne({ mobile: req.body.mobile });
+  const userTransaction = await Transaction.find({
+    userID: user._id.toString()
+  });
+  return res.send({ userTransaction });
 };

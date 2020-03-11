@@ -20,10 +20,18 @@ router.post(
 
 // get user details
 
-router.post("/userDetails", Admin.userDetails);
+router.post("/userDetails", Auth.auth.checkToken, Admin.userDetails);
 
 // update news
 
 router.post("/addNews", Auth.auth.checkToken, Admin.addNews);
+
+//user leaderboard
+
+router.post("/leaderboard", Auth.auth.checkToken, Admin.leaderboard);
+
+//user transaction
+
+router.post("/transaction", Auth.auth.checkToken, Admin.transaction);
 
 module.exports = router;
