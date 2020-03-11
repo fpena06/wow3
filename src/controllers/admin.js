@@ -27,14 +27,20 @@ exports.login = async (req, res) => {
 // change company share value
 
 exports.updateCompanyShareValue = async (req, res) => {
-  let company = await Company.findById(req.body._id);
-  await Company.findByIdAndUpdate(req.body._id, {
+  let company = await Company.findById(req.body.Company_id);
+  let changeValue = company.shareValue - req.body.shareValue;
+  let status;
+  if (changeValue === 0)
+    return res.send({ message: "previous and current value cannot be same" });
+  else if (changeValue > 0) status = "down";
+  else status = "up";
+  await Company.findByIdAndUpdate(req.body.Company_id, {
     previousValue: [...company.previousValue, company.shareValue],
     shareValue: req.body.shareValue
   });
-  company = await Company.findById(req.body._id);
-  await res.io.emit("global", { company: company, type: "company" });
-  res.send(company);
+  company = await Company.findById(req.body.Company_id);
+  // await res.io.emit("global", { company: company, type: "company" });
+  res.send({ company, status });
 };
 
 exports.dashboard = async (req, res) => {
