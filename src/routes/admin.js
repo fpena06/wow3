@@ -20,7 +20,7 @@ router.post(
 
 // get user details
 
-router.post("/userDetails", Auth.auth.checkToken, Admin.userDetails);
+router.post("/userDetails", Admin.userDetails);
 
 // update news
 

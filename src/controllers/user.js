@@ -355,13 +355,17 @@ exports.addToWatchlist = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile
   });
-  const company = await Company.findById(req.body.Company_id);
+  const company = await Company.findById(req.body.Company_id).select([
+    "name",
+    "shareValue",
+    "previousValue"
+  ]);
   await User.findByIdAndUpdate(user._id, {
     watchList: [
       ...user.watchList,
       {
         name: company.name,
-        shareValue: company.shareValue,
+        shareValue: Number(company.shareValue),
         previousValue: company.previousValue
       }
     ]
@@ -377,7 +381,9 @@ exports.removeFromWatchlist = async (req, res) => {
   });
   if (!user) return res.send({ message: "user not present in database..." });
   let newWatchlist = user.watchList.filter(
-    p => p.name.toString() != req.body.Company_name.toString()
+    p =>
+      p.name.toLowerCase().toString() !=
+      req.body.Company_name.toLowerCase().toString()
   );
   await User.findByIdAndUpdate(user._id, {
     watchList: newWatchlist

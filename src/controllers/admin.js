@@ -81,4 +81,5 @@ exports.addNews = async (req, res) => {
     description: req.body.description
   });
   await news.save();
+  res.send(news);
 };
