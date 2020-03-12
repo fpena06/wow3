@@ -103,9 +103,9 @@ exports.dashboardCategory = async (req, res) => {
 
   let xyz = await companyCategory.map(company => {
     let foundCompany = userCurrentHoldings.find(
-      p => p.Company_id === company._id
+      p => p.Company_id.toString() == company._id.toString()
     );
-
+    // console.log(foundCompany);
     let obj = {
       _id: company._id,
       name: company.name,
@@ -157,8 +157,9 @@ exports.buyShares = async (req, res) => {
   const company = await Company.findById(req.body.Company_id);
   const shareAmount = company.shareValue * req.body.shareCount;
   const currentHoldingsWanted = user.currentHoldings.find(
-    p => p.Company_id.toString() == req.body.Company_id
+    p => p.Company_id.toString() === req.body.Company_id
   );
+  console.log(currentHoldingsWanted);
   if (req.body.shareCount > company.shareCount)
     return res.send({ message: "Enter valid number of shares..." });
   if (user.walletAmount < shareAmount)
