@@ -19,7 +19,7 @@ exports.login = async (req, res) => {
       );
       res.send({
         message: "Sucessfully logged in ...",
-        user: { mobile: user.mobile, name: user.name },
+        user: { mobile: user.mobile, name: user.name, _id: user._id },
         token
       });
     } else return res.send({ message: "incorrect password" });
@@ -153,11 +153,7 @@ exports.transaction = async (req, res) => {
 
 exports.buyShares = async (req, res) => {
   let changedUser;
-  let decoded = await jwt.decode(
-    req.headers["x-access-token"],
-    config.get("TOKEN")
-  );
-  const user = await User.findOne({ mobile: decoded.mobile });
+  const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
   const shareAmount = company.shareValue * req.body.shareCount;
   const currentHoldingsWanted = user.currentHoldings.find(
@@ -175,12 +171,12 @@ exports.buyShares = async (req, res) => {
       currentHolders: [
         ...company.currentHolders,
         {
-          User_id: user._id,
+          User_id: req.body.User_id,
           shareCount: req.body.shareCount
         }
       ]
     });
-    await User.findByIdAndUpdate(user._id, {
+    await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: user.walletAmount - shareAmount,
       currentHoldings: [
         ...user.currentHoldings,
@@ -201,7 +197,7 @@ exports.buyShares = async (req, res) => {
     );
 
     let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != user._id.toString()
+      p => p.User_id.toString() != req.body.User_id.toString()
     );
 
     let newObj = {
@@ -214,13 +210,13 @@ exports.buyShares = async (req, res) => {
     };
 
     let newObjCompany = {
-      User_id: user._id,
+      User_id: req.body.User_id,
       shareCount: currentHoldingsWanted.shareCount + req.body.shareCount
     };
 
     newHoldings.push(newObj);
     newHolders.push(newObjCompany);
-    await User.findByIdAndUpdate(user._id, {
+    await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
@@ -231,7 +227,7 @@ exports.buyShares = async (req, res) => {
     });
   }
   transaction = new Transaction({
-    userID: user._id,
+    userID: req.body.User_id,
     companyID: req.body.Company_id,
     time: new Date(),
     type: "buy",
@@ -251,13 +247,13 @@ exports.buyShares = async (req, res) => {
     leaderboardTop,
     grossingCompany
   };
+  console.log(leaderboardTop);
   await res.io.emit("global", { global: global, type: "stat" });
-  changedUser = await User.findById(user._id).select([
+  changedUser = await User.findById(req.body.User_id).select([
     "walletAmount",
     "mobile",
     "currentHoldings"
   ]);
-  console.log(changedUser);
   await res.io.emit("user", { user: changedUser, type: "stat" });
   changedCompany = await Company.findById(req.body.Company_id).select([
     "shareValue",
@@ -268,17 +264,15 @@ exports.buyShares = async (req, res) => {
     company: changedCompany,
     type: "company stat"
   });
+  console.log(changedCompany);
+  console.log(changedUser);
   res.send({ message: "Shares bought sucessfully..." });
 };
 
 //sell shares
 
 exports.sellShares = async (req, res) => {
-  let decoded = await jwt.decode(
-    req.headers["x-access-token"],
-    config.get("TOKEN")
-  );
-  const user = await User.findOne({ mobile: decoded.mobile });
+  const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
   const currentHoldingsWanted = user.currentHoldings.find(
     p => p.Company_id.toString() == req.body.Company_id
@@ -293,13 +287,13 @@ exports.sellShares = async (req, res) => {
     );
 
     let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != user._id.toString()
+      p => p.User_id.toString() != req.body.User_id.toString()
     );
 
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
-    await User.findByIdAndUpdate(user._id, {
+    await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
@@ -314,7 +308,7 @@ exports.sellShares = async (req, res) => {
     );
 
     let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != user._id.toString()
+      p => p.User_id.toString() != req.body.User_id.toString()
     );
 
     let newObj = {
@@ -327,7 +321,7 @@ exports.sellShares = async (req, res) => {
     };
 
     let newObjCompany = {
-      User_id: user._id,
+      User_id: req.body.User_id,
       shareCount: currentHoldingsWanted.shareCount - req.body.shareCount
     };
 
@@ -337,7 +331,7 @@ exports.sellShares = async (req, res) => {
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
-    await User.findByIdAndUpdate(user._id, {
+    await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
@@ -348,7 +342,7 @@ exports.sellShares = async (req, res) => {
     });
   }
   transaction = new Transaction({
-    userID: user._id,
+    userID: req.body.User_id,
     companyID: req.body.Company_id,
     time: new Date(),
     type: "sell",
@@ -369,7 +363,7 @@ exports.sellShares = async (req, res) => {
     grossingCompany
   };
   await res.io.emit("global", { global: global, type: "stat" });
-  changedUser = await User.findById(user._id).select([
+  changedUser = await User.findById(req.body.User_id).select([
     "walletAmount",
     "mobile",
     "currentHoldings"
