@@ -17,7 +17,7 @@ router.post("/dashboard/stat", Auth.auth.checkToken, User.dashboard);
 // user dashboard after selecting category
 
 router.post(
-  "/dashboard/:category",
+  "/dashboard/category",
   Auth.auth.checkToken,
   User.dashboardCategory
 );
