@@ -38,13 +38,11 @@ exports.changePassword = async (req, res) => {
   user.password = req.body.newPassword;
   await user.save();
   res.send("password updated sucessfully");
-  console.log("password updated sucessfully");
 };
 
 //user dashboard stats
 
 exports.dashboardSocket = async data => {
-  console.log(data.mobile);
   const user = await User.findOne({
     mobile: data.mobile
   });
@@ -83,7 +81,6 @@ exports.category = async (req, res) => {
   let companies = await Company.find();
 
   let uniqueCategory = [...new Set(companies.map(c => c.category))];
-  console.log(uniqueCategory);
   res.send(uniqueCategory);
 };
 
@@ -158,7 +155,6 @@ exports.buyShares = async (req, res) => {
   const currentHoldingsWanted = user.currentHoldings.find(
     p => p.Company_id.toString() === req.body.Company_id
   );
-  console.log(currentHoldingsWanted);
   if (req.body.shareCount > company.shareCount)
     return res.send({ message: "Enter valid number of shares..." });
   if (user.walletAmount < shareAmount)
@@ -247,19 +243,7 @@ exports.buyShares = async (req, res) => {
     leaderboardTop,
     grossingCompany
   };
-  await res.io.emit("global", { global: global, type: "stat" });
-  changedUser = await User.findById(req.body.User_id).select([
-    "walletAmount",
-    "mobile",
-    "currentHoldings"
-  ]);
 
-  let companyFound = await changedUser.currentHoldings.find(
-    p => p.Company_id.toString() === company._id.toString()
-  );
-  let boughtVolume = companyFound.shareCount;
-  console.log(boughtVolume);
-  await res.io.emit("user", { user: changedUser, type: "stat" });
   changedCompany = await Company.findById(req.body.Company_id).select([
     "_id",
     "name",
@@ -267,10 +251,22 @@ exports.buyShares = async (req, res) => {
     "shareCount",
     "previousValue"
   ]);
-  await res.io.emit("company", {
-    company: { ...changedCompany, boughtVolume },
-    type: "company stat"
+  await res.io.emit("global", { global: global, type: "stat" });
+  changedUser = await User.findById(req.body.User_id).select([
+    "walletAmount",
+    "mobile",
+    "currentHoldings"
+  ]);
+  let companyFound = await changedUser.currentHoldings.find(
+    p => p.Company_id.toString() === company._id.toString()
+  );
+  let boughtVolume = companyFound.shareCount;
+  await res.io.emit("user", {
+    boughtVolume: boughtVolume,
+    user: changedUser,
+    type: "company"
   });
+  await res.io.emit("global", { company: changedCompany, type: "company" });
   res.send({ message: "Shares bought sucessfully..." });
 };
 
@@ -383,8 +379,6 @@ exports.sellShares = async (req, res) => {
     company: changedCompany,
     type: "company stat"
   });
-  console.log(changedUser);
-  console.log(changedCompany);
   res.send({ message: "Shares Sold Successfully" });
 };
 
