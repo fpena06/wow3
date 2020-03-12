@@ -61,7 +61,7 @@ mongoose.connect(
   }
 );
 app.get("/", (req, res) => {
-  res.send({ message: config.get("dburl") });
+  res.send({ message: config.get("DBURL") });
 });
 app.use("/user", routes.user);
 app.use("/admin", routes.admin);

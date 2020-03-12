@@ -11,7 +11,7 @@ const CompanySchema = mongoose.Schema({
     }
   ],
   shareCount: Number,
-  previousValue: [{ type: Number }]
+  previousValue: [{ value: { type: Number }, time: Date }]
 });
 
 function companyValidation(Company) {
