@@ -351,7 +351,7 @@ exports.sellShares = async (req, res) => {
     userID: req.body.User_id,
     companyID: req.body.Company_id,
     time: new Date(),
-    type: "sell",
+    type: "buy",
     numberOfShares: req.body.shareCount,
     shareAmount: company.shareValue * req.body.shareCount
   });
@@ -368,21 +368,34 @@ exports.sellShares = async (req, res) => {
     leaderboardTop,
     grossingCompany
   };
-  await res.io.emit("global", { global: global, type: "stat" });
+
+  changedCompany = await Company.findById(req.body.Company_id).select([
+    "_id",
+    "name",
+    "shareValue",
+    "shareCount",
+    "previousValue"
+  ]);
   changedUser = await User.findById(req.body.User_id).select([
     "walletAmount",
     "mobile",
     "currentHoldings"
   ]);
-  await res.io.emit("user", { user: changedUser, type: "stat" });
-  changedCompany = await Company.findById(req.body.Company_id).select([
-    "shareValue",
-    "shareCount",
-    "previousValue"
-  ]);
-  await res.io.emit("company", {
+  let companyFound = await changedUser.currentHoldings.find(
+    p => p.Company_id.toString() === company._id.toString()
+  );
+  let boughtVolume = companyFound.shareCount;
+  await res.io.emit("user", {
+    user: changedUser,
+    boughtVolume: boughtVolume,
     company: changedCompany,
-    type: "company stat"
+    type: "company"
+  });
+  await res.io.emit("global", { company: changedCompany, type: "company" });
+  await res.io.emit("global", { global: global, type: "stat" });
+  await res.io.emit("user", {
+    user: changedUser,
+    type: "stat"
   });
   res.send({ message: "Shares Sold Successfully" });
 };
