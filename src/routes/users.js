@@ -22,6 +22,9 @@ router.post(
   User.dashboardCategory
 );
 
+//  get category
+
+router.post("/category", User.category);
 // news section
 
 router.post("/news", Auth.auth.checkToken, User.newsDisplay);

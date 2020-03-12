@@ -77,6 +77,16 @@ exports.dashboard = async (req, res) => {
   });
 };
 
+// user dashboard for category
+
+exports.category = async (req, res) => {
+  let companies = await Company.find();
+
+  let uniqueCategory = [...new Set(companies.map(c => c.category))];
+  console.log(uniqueCategory);
+  res.send("hii");
+};
+
 //user dashboard after selecting category
 
 exports.dashboardCategory = async (req, res) => {
