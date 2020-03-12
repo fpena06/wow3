@@ -266,6 +266,7 @@ exports.buyShares = async (req, res) => {
   );
   let boughtVolume = companyFound.shareCount;
   await res.io.emit("user", {
+    user: changedUser,
     boughtVolume: boughtVolume,
     company: changedCompany,
     type: "company"
