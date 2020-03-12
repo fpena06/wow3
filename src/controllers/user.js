@@ -251,11 +251,6 @@ exports.buyShares = async (req, res) => {
     "shareCount",
     "previousValue"
   ]);
-  await res.io.emit("global", { global: global, type: "stat" });
-  await res.io.emit("user", {
-    user: changedUser,
-    type: "stat"
-  });
   changedUser = await User.findById(req.body.User_id).select([
     "walletAmount",
     "mobile",
@@ -272,6 +267,11 @@ exports.buyShares = async (req, res) => {
     type: "company"
   });
   await res.io.emit("global", { company: changedCompany, type: "company" });
+  await res.io.emit("global", { global: global, type: "stat" });
+  await res.io.emit("user", {
+    user: changedUser,
+    type: "stat"
+  });
   res.send({ message: "Shares bought sucessfully..." });
 };
 
