@@ -41,7 +41,12 @@ exports.addCompany = async (req, res) => {
       shareValue: req.body.shareValue,
       currentHolders: [],
       shareCount: req.body.shareCount,
-      previousValue: []
+      previousValue: [
+        {
+          value: req.body.shareValue,
+          time: new Date(currentTime.getTime() + (330 + currentOffset) * 60000)
+        }
+      ]
     });
     await company.save();
     res.json({
