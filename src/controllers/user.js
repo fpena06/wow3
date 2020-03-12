@@ -413,12 +413,12 @@ exports.addToWatchlist = async (req, res) => {
   ]);
   let flag = 0;
   user.watchList.forEach(p => {
-    if (p.name === company.name) flag = 1;
+    if (p.name === company.name) return (flag = 1);
   });
   if (flag === 0) {
     const shareValueChange =
       company.shareValue -
-      company.previousValue[company.previousValue.length - 1];
+      company.previousValue[company.previousValue.length - 1].value;
     const shareValuePercentage = (shareValueChange / company.shareValue) * 100;
     await User.findByIdAndUpdate(user._id, {
       watchList: [

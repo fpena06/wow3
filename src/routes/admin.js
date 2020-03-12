@@ -2,6 +2,10 @@ const router = require("express").Router();
 const Admin = require("../controllers/admin");
 const Auth = require("../middleware/index");
 
+//add admin
+
+router.post("/addAdmin", Admin.addAdmin);
+
 // add user
 
 router.post("/addUser", Admin.addUser);

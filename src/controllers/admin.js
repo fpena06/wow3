@@ -8,6 +8,23 @@ let {
   Transaction
 } = require("../models");
 const jwt = require("jsonwebtoken");
+const config = require("config");
+
+//add admin
+
+exports.addAdmin = async (req, res) => {
+  admin = new Admin({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    mobile: req.body.mobile
+  });
+  await admin.save();
+  res.json({
+    message: "admin added sucessfully"
+  });
+};
+
 // admin login
 
 exports.login = async (req, res) => {
@@ -139,6 +156,7 @@ exports.userDetails = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile
   }).select(["name", "email", "password", "mobile"]);
+  if (!user) return res.send("user does not exist");
   res.send(user);
 };
 
