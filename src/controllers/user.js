@@ -97,9 +97,27 @@ exports.dashboardCategory = async (req, res) => {
   const companyCategory = await Company.find({
     category: req.body.category
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
+
   const user = await User.findOne({ mobile: decoded.mobile });
   const userCurrentHoldings = await user.currentHoldings;
-  return res.send({ companies: companyCategory });
+
+  let xyz = await companyCategory.map(company => {
+    let foundCompany = userCurrentHoldings.find(
+      p => p.Company_id === company._id
+    );
+
+    let obj = {
+      _id: company._id,
+      name: company.name,
+      shareValue: company.shareValue,
+      shareCount: company.shareCount,
+      previousValue: company.previousValue,
+      boughtVolume: foundCompany ? foundCompany.shareCount : 0
+    };
+
+    return obj;
+  });
+  return res.send({ companies: xyz });
 };
 
 // news display
