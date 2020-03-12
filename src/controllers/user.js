@@ -90,10 +90,16 @@ exports.category = async (req, res) => {
 //user dashboard after selecting category
 
 exports.dashboardCategory = async (req, res) => {
+  let decoded = await jwt.decode(
+    req.headers["x-access-token"],
+    config.get("TOKEN")
+  );
   const companyCategory = await Company.find({
     category: req.body.category
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
-  return res.send(companyCategory);
+  const user = await User.findOne({ mobile: decoded.mobile });
+  const userCurrentHoldings = await user.currentHoldings;
+  return res.send([companyCategory, userCurrentHoldings]);
 };
 
 // news display
