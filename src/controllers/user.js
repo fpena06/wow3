@@ -99,7 +99,7 @@ exports.dashboardCategory = async (req, res) => {
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
   const user = await User.findOne({ mobile: decoded.mobile });
   const userCurrentHoldings = await user.currentHoldings;
-  return res.send([companyCategory, userCurrentHoldings]);
+  return res.send({ companies: companyCategory });
 };
 
 // news display
