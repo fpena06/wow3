@@ -7,11 +7,13 @@ let {
   News,
   Transaction
 } = require("../models");
-
+const jwt = require("jsonwebtoken");
 // admin login
 
 exports.login = async (req, res) => {
-  const admin = await Admin.findOne({ email: req.body.email });
+  console.log(req.body);
+  const admin = await Admin.findOne({ mobile: req.body.mobile });
+  console.log(admin);
   if (!admin) {
     return res.send("Invalid credentials  ...");
   } else {
