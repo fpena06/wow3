@@ -153,7 +153,11 @@ exports.transaction = async (req, res) => {
 
 exports.buyShares = async (req, res) => {
   let changedUser;
-  const user = await User.findById(req.body.User_id);
+  let decoded = await jwt.decode(
+    req.headers["x-access-token"],
+    config.get("TOKEN")
+  );
+  const user = await User.findOne({ mobile: decoded.mobile });
   const company = await Company.findById(req.body.Company_id);
   const shareAmount = company.shareValue * req.body.shareCount;
   const currentHoldingsWanted = user.currentHoldings.find(
@@ -272,7 +276,11 @@ exports.buyShares = async (req, res) => {
 //sell shares
 
 exports.sellShares = async (req, res) => {
-  const user = await User.findById(req.body.User_id);
+  let decoded = await jwt.decode(
+    req.headers["x-access-token"],
+    config.get("TOKEN")
+  );
+  const user = await User.findOne({ mobile: decoded.mobile });
   const company = await Company.findById(req.body.Company_id);
   const currentHoldingsWanted = user.currentHoldings.find(
     p => p.Company_id.toString() == req.body.Company_id
