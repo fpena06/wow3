@@ -384,7 +384,7 @@ exports.sellShares = async (req, res) => {
   let companyFound = await changedUser.currentHoldings.find(
     p => p.Company_id.toString() === company._id.toString()
   );
-  let boughtVolume = companyFound.shareCount;
+  let boughtVolume = companyFound ? companyFound.shareCount : 0;
   await res.io.emit("user", {
     user: changedUser,
     boughtVolume: boughtVolume,
