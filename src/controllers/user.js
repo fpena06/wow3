@@ -196,9 +196,11 @@ exports.buyShares = async (req, res) => {
       p => p.Company_id.toString() != req.body.Company_id.toString()
     );
 
-    let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != req.body.User_id.toString()
-    );
+    let newHolders = company.currentHolders.filter(p => {
+      console.log(p.User_id);
+      console.log(req.body.User_id);
+      return p.User_id.toString() != req.body.User_id.toString();
+    });
 
     let newObj = {
       Company_id: req.body.Company_id,
