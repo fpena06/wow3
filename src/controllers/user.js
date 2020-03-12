@@ -105,7 +105,6 @@ exports.dashboardCategory = async (req, res) => {
     let foundCompany = userCurrentHoldings.find(
       p => p.Company_id.toString() == company._id.toString()
     );
-    // console.log(foundCompany);
     let obj = {
       _id: company._id,
       name: company.name,
@@ -198,8 +197,6 @@ exports.buyShares = async (req, res) => {
     );
 
     let newHolders = company.currentHolders.filter(p => {
-      console.log(p.User_id);
-      console.log(req.body.User_id);
       return p.User_id.toString() != req.body.User_id.toString();
     });
 
@@ -250,25 +247,30 @@ exports.buyShares = async (req, res) => {
     leaderboardTop,
     grossingCompany
   };
-  console.log(leaderboardTop);
   await res.io.emit("global", { global: global, type: "stat" });
   changedUser = await User.findById(req.body.User_id).select([
     "walletAmount",
     "mobile",
     "currentHoldings"
   ]);
+
+  let companyFound = await changedUser.currentHoldings.find(
+    p => p.Company_id.toString() === company._id.toString()
+  );
+  let boughtVolume = companyFound.shareCount;
+  console.log(boughtVolume);
   await res.io.emit("user", { user: changedUser, type: "stat" });
   changedCompany = await Company.findById(req.body.Company_id).select([
+    "_id",
+    "name",
     "shareValue",
     "shareCount",
     "previousValue"
   ]);
   await res.io.emit("company", {
-    company: changedCompany,
+    company: { ...changedCompany, boughtVolume },
     type: "company stat"
   });
-  console.log(changedCompany);
-  console.log(changedUser);
   res.send({ message: "Shares bought sucessfully..." });
 };
 
@@ -417,6 +419,7 @@ exports.addToWatchlist = async (req, res) => {
       ]
     });
   } else return res.send("company already exist in watchlist");
+  res.io.emit("company");
   res.send({ message: "added to watchlist sucessfully" });
 };
 
