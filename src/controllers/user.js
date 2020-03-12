@@ -175,12 +175,12 @@ exports.buyShares = async (req, res) => {
       currentHolders: [
         ...company.currentHolders,
         {
-          User_id: req.body.User_id,
+          User_id: user._id,
           shareCount: req.body.shareCount
         }
       ]
     });
-    await User.findByIdAndUpdate(req.body.User_id, {
+    await User.findByIdAndUpdate(user._id, {
       walletAmount: user.walletAmount - shareAmount,
       currentHoldings: [
         ...user.currentHoldings,
@@ -201,7 +201,7 @@ exports.buyShares = async (req, res) => {
     );
 
     let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != req.body.User_id.toString()
+      p => p.User_id.toString() != user._id.toString()
     );
 
     let newObj = {
@@ -214,13 +214,13 @@ exports.buyShares = async (req, res) => {
     };
 
     let newObjCompany = {
-      User_id: req.body.User_id,
+      User_id: user._id,
       shareCount: currentHoldingsWanted.shareCount + req.body.shareCount
     };
 
     newHoldings.push(newObj);
     newHolders.push(newObjCompany);
-    await User.findByIdAndUpdate(req.body.User_id, {
+    await User.findByIdAndUpdate(user._id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
@@ -231,7 +231,7 @@ exports.buyShares = async (req, res) => {
     });
   }
   transaction = new Transaction({
-    userID: req.body.User_id,
+    userID: user._id,
     companyID: req.body.Company_id,
     time: new Date(),
     type: "buy",
@@ -253,7 +253,7 @@ exports.buyShares = async (req, res) => {
   };
   console.log(leaderboardTop);
   await res.io.emit("global", { global: global, type: "stat" });
-  changedUser = await User.findById(req.body.User_id).select([
+  changedUser = await User.findOne({ mobile: user.mobile }).select([
     "walletAmount",
     "mobile",
     "currentHoldings"
@@ -295,13 +295,13 @@ exports.sellShares = async (req, res) => {
     );
 
     let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != req.body.User_id.toString()
+      p => p.User_id.toString() != user._id.toString()
     );
 
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
-    await User.findByIdAndUpdate(req.body.User_id, {
+    await User.findByIdAndUpdate(user._id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
@@ -316,7 +316,7 @@ exports.sellShares = async (req, res) => {
     );
 
     let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != req.body.User_id.toString()
+      p => p.User_id.toString() != user._id.toString()
     );
 
     let newObj = {
@@ -329,7 +329,7 @@ exports.sellShares = async (req, res) => {
     };
 
     let newObjCompany = {
-      User_id: req.body.User_id,
+      User_id: user._id,
       shareCount: currentHoldingsWanted.shareCount - req.body.shareCount
     };
 
@@ -339,7 +339,7 @@ exports.sellShares = async (req, res) => {
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
-    await User.findByIdAndUpdate(req.body.User_id, {
+    await User.findByIdAndUpdate(user._id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
@@ -350,7 +350,7 @@ exports.sellShares = async (req, res) => {
     });
   }
   transaction = new Transaction({
-    userID: req.body.User_id,
+    userID: user._id,
     companyID: req.body.Company_id,
     time: new Date(),
     type: "sell",
@@ -371,7 +371,7 @@ exports.sellShares = async (req, res) => {
     grossingCompany
   };
   await res.io.emit("global", { global: global, type: "stat" });
-  changedUser = await User.findById(req.body.User_id).select([
+  changedUser = await User.findById(user._id).select([
     "walletAmount",
     "mobile",
     "currentHoldings"
