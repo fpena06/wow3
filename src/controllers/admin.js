@@ -28,6 +28,11 @@ exports.login = async (req, res) => {
 // add company
 
 exports.addCompany = async (req, res) => {
+  var currentTime = new Date();
+
+  var currentOffset = currentTime.getTimezoneOffset();
+
+  var ISTOffset = 330;
   let { error } = await companyValidation(req.body);
   if (error) {
     console.log(error);
@@ -44,7 +49,9 @@ exports.addCompany = async (req, res) => {
       previousValue: [
         {
           value: req.body.shareValue,
-          time: new Date(currentTime.getTime() + (330 + currentOffset) * 60000)
+          time: new Date(
+            currentTime.getTime() + (ISTOffset + currentOffset) * 60000
+          )
         }
       ]
     });
@@ -58,6 +65,11 @@ exports.addCompany = async (req, res) => {
 // change company share value
 
 exports.updateCompanyShareValue = async (req, res) => {
+  var currentTime = new Date();
+
+  var currentOffset = currentTime.getTimezoneOffset();
+
+  var ISTOffset = 330;
   let company = await Company.findById(req.body.Company_id);
   if (company) {
     let changeValue = company.shareValue - req.body.shareValue;
@@ -71,7 +83,9 @@ exports.updateCompanyShareValue = async (req, res) => {
         ...company.previousValue,
         {
           value: company.shareValue,
-          time: new Date(currentTime.getTime() + (330 + currentOffset) * 60000)
+          time: new Date(
+            currentTime.getTime() + (ISTOffset + currentOffset) * 60000
+          )
         }
       ],
       shareValue: req.body.shareValue
