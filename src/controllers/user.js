@@ -84,7 +84,7 @@ exports.category = async (req, res) => {
 
   let uniqueCategory = [...new Set(companies.map(c => c.category))];
   console.log(uniqueCategory);
-  res.send("hii");
+  res.send(uniqueCategory);
 };
 
 //user dashboard after selecting category
