@@ -434,8 +434,8 @@ exports.addToWatchlist = async (req, res) => {
       ]
     });
   } else return res.send({ message: "company already exist in watchlist" });
-  const User_mobile = await User.findById(user._id).select("mobile");
   const user1 = await User.findById(user._id);
+  const User_mobile = user1.mobile;
   const watchList = user1.watchList;
   await res.io.emit("user", {
     User_mobile: User_mobile,
