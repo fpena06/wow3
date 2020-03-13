@@ -136,22 +136,43 @@ exports.leaderboard = async (req, res) => {
 exports.transaction = async (req, res) => {
   const userTransactions = await Transaction.find({ userID: req.body.User_id });
 
-  let userTransaction = await userTransactions.map(async t => {
-    let company = await Company.findById(t.companyID.toString());
-    let sharePrice = t.shareAmount / t.shareCount;
+  let userTransaction = [];
+  let company;
+  let sharePrice;
+  let t;
 
-    let obj = await {
+  for (let i = 0; i < userTransactions.length; i++) {
+    company = await Company.findById(t.companyID.toString());
+    sharePrice = t.shareAmount / t.numberOfShares;
+    t = userTransactions[i];
+
+    userTransaction.push({
       time: t.time,
       companyName: company.name,
       sharePrice: sharePrice,
       shareQuantity: t.numberOfShares,
       totalAmount: t.shareAmount
-    };
+    });
+  }
 
-    console.log("Transaction", obj);
+  console.log(userTransaction);
 
-    return await obj;
-  });
+  // let userTransaction = await userTransactions.map(async t => {
+  //   let company = await Company.findById(t.companyID.toString());
+  //   let sharePrice = t.shareAmount / t.shareCount;
+
+  //   let obj = await {
+  //     time: t.time,
+  //     companyName: company.name,
+  //     sharePrice: sharePrice,
+  //     shareQuantity: t.numberOfShares,
+  //     totalAmount: t.shareAmount
+  //   };
+
+  //   console.log("Transaction", obj);
+
+  //   return await obj;
+  // });
 
   let user = await User.findById(req.body.User_id);
 
