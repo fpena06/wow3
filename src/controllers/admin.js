@@ -111,6 +111,11 @@ exports.updateCompanyShareValue = async (req, res) => {
     });
     company = await Company.findById(req.body.Company_id);
     // await res.io.emit("global", { company: company, type: "company" });
+    res.io.emit("global", {
+      company: company,
+      status: status,
+      type: "stockbar"
+    });
     res.send({ company, status });
   } else return res.send({ message: "No such company exist" });
 };
