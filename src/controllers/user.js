@@ -147,6 +147,9 @@ exports.transaction = async (req, res) => {
       shareQuantity: t.shareCount,
       totalAmount: t.shareAmount
     };
+
+    console.log(obj);
+
     return obj;
   });
 
@@ -158,6 +161,7 @@ exports.transaction = async (req, res) => {
       companyName: company.name,
       shareCount: c.shareCount
     };
+    console.log(obj);
     return obj;
   });
 
