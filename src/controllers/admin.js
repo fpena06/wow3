@@ -112,6 +112,7 @@ exports.updateCompanyShareValue = async (req, res) => {
       shareValue: req.body.shareValue
     });
     let users = await User.find();
+    console.log(users);
     let neededUsers = users.watchList.find(p => {
       p.Company_id.toString() === req.body.Company_id.toString();
     });
