@@ -137,7 +137,7 @@ exports.transaction = async (req, res) => {
   const userTransactions = await Transaction.find({ userID: req.body.User_id });
 
   let userTransaction = userTransactions.map(async t => {
-    let company = await Company.findById(t.companyID);
+    let company = await Company.findById(t.companyID.toString());
     let sharePrice = t.shareAmount / t.shareCount;
 
     let obj = {
@@ -153,7 +153,7 @@ exports.transaction = async (req, res) => {
   let user = await User.findById(req.body.User_id);
 
   let userCurrentHoldings = user.currentHoldings.map(async c => {
-    let company = await Company.findById(c.Company_id);
+    let company = await Company.findById(c.Company_id.toString());
     let obj = {
       companyName: company.name,
       shareCount: c.shareCount
