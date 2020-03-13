@@ -406,6 +406,7 @@ exports.addToWatchlist = async (req, res) => {
     mobile: req.body.mobile
   });
   const company = await Company.findById(req.body.Company_id).select([
+    "_id",
     "name",
     "shareValue",
     "previousValue"
@@ -425,6 +426,7 @@ exports.addToWatchlist = async (req, res) => {
       watchList: [
         ...user.watchList,
         {
+          _id: company._id,
           name: company.name,
           shareValue: company.shareValue,
           shareValuePercentage
