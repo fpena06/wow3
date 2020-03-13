@@ -134,7 +134,9 @@ exports.leaderboard = async (req, res) => {
 // transactions
 
 exports.transaction = async (req, res) => {
-  const userTransactions = await Transaction.find({ userID: req.body.User_id });
+  const userTransactions = await Transaction.find({
+    userID: req.body.User_id
+  }).sort({ time: -1 });
 
   let userTransaction = [];
   let userCurrentHoldings = [];
