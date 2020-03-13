@@ -90,12 +90,14 @@ exports.updateCompanyShareValue = async (req, res) => {
 
   var ISTOffset = 330;
   let company = await Company.findById(req.body.Company_id);
+  if (!req.body.shareValue) return res.send("share value is needed");
   if (company) {
-    let changeValue = company.shareValue - req.body.shareValue;
+    let changeValue = req.body.shareValue - company.shareValue;
+    let shareValuePercentage = (changeValue / company.shareValue) * 100;
     let status;
     if (changeValue === 0)
       return res.send({ message: "previous and current value cannot be same" });
-    else if (changeValue > 0) status = "down";
+    else if (changeValue < 0) status = "down";
     else status = "up";
     await Company.findByIdAndUpdate(req.body.Company_id, {
       previousValue: [
@@ -109,6 +111,23 @@ exports.updateCompanyShareValue = async (req, res) => {
       ],
       shareValue: req.body.shareValue
     });
+    let users = await User.find();
+    let neededUsers = users.watchList.find(p => {
+      p.Company_id.toString() === req.body.Company_id.toString();
+    });
+    for (let i = 0; i < neededUsers.length; i++) {
+      let user1 = neededUsers[i];
+      let index = user1.findIndex(
+        p => p.Company_id.toString() === req.body.Company_id.toString()
+      );
+      user1.splice(index, 1, {
+        Company_id: req.body.Company_id,
+        name: company.name,
+        shareValue: req.body.shareValue,
+        shareValuePercentage: shareValuePercentage
+      });
+      await user1.save();
+    }
     company = await Company.findById(req.body.Company_id);
     // await res.io.emit("global", { company: company, type: "company" });
     res.io.emit("global", {
