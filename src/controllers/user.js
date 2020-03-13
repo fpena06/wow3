@@ -442,10 +442,9 @@ exports.removeFromWatchlist = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile
   });
-  const company = await Company.findById({ _id: req.body.Company_id });
+  const company = await Company.findById(req.body.Company_id);
   let checkWatchlist = user.watchList.find(
-    p =>
-      p.name.toLowerCase().toString() === company.name.toLowerCase().toString()
+    p => p.name.toString() === company.name.toString()
   );
   if (!user) return res.send({ message: "user not present in database..." });
   if (!checkWatchlist)
