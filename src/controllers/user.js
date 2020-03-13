@@ -165,6 +165,8 @@ exports.transaction = async (req, res) => {
     return obj;
   });
 
+  console.log(userCurrentHoldings);
+
   return res.send({
     userTransaction: userTransaction,
     userCurrentHoldings: userCurrentHoldings
