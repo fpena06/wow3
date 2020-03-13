@@ -2,6 +2,13 @@ let { User, Company, Transaction, News } = require("../models");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 
+//get end time
+
+exports.time = async (req, res) => {
+  const time = config.get("ENDTIME");
+  res.send({ message: "Hey there", time });
+};
+
 // user login
 
 exports.login = async (req, res) => {
@@ -32,11 +39,13 @@ exports.changePassword = async (req, res) => {
     mobile: req.body.mobile
   });
   if (user.password != req.body.oldPassword) {
-    return res.send("old password is incorrect. please enter valid password");
+    return res.send({
+      message: "old password is incorrect. please enter valid password"
+    });
   }
   user.password = req.body.newPassword;
   await user.save();
-  res.send("password updated sucessfully");
+  res.send({ message: "password updated successfully" });
 };
 
 //user dashboard stats
@@ -171,19 +180,6 @@ exports.transaction = async (req, res) => {
       shareCount: c.shareCount
     });
   }
-
-  // let userCurrentHoldings = await user.currentHoldings.map(async c => {
-  //   let
-  //   let obj = await {
-  //     companyName: company.name,
-  //     shareCount: c.shareCount
-  //   };
-  //   console.log("CH", obj);
-  //   return await obj;
-  // });
-
-  // console.log(userCurrentHoldings);
-
   return res.send({
     userTransaction: userTransaction,
     userCurrentHoldings: userCurrentHoldings

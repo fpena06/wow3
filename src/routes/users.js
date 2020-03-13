@@ -62,4 +62,8 @@ router.post(
 
 router.post("/watchlist", Auth.auth.checkToken, User.watchlist);
 
+// get end time
+
+router.post("/getEndTime", Auth.auth.checkToken, User.time);
+
 module.exports = router;
