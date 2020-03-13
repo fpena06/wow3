@@ -1,5 +1,4 @@
 let { User, Company, Transaction, News } = require("../models");
-const mongoose = require("mongoose");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 
@@ -430,7 +429,7 @@ exports.addToWatchlist = async (req, res) => {
         }
       ]
     });
-  } else return res.send("company already exist in watchlist");
+  } else return res.send({ message: "company already exist in watchlist" });
   res.io.emit("company");
   res.send({ message: "added to watchlist sucessfully" });
 };
@@ -441,7 +440,14 @@ exports.removeFromWatchlist = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile
   });
+  let checkWatchlist = user.watchList.find(
+    p =>
+      p.name.toLowerCase().toString() ===
+      req.body.Company_name.toLowerCase().toString()
+  );
   if (!user) return res.send({ message: "user not present in database..." });
+  if (!checkWatchlist)
+    return res.send({ message: "company not present in watchlist" });
   let newWatchlist = user.watchList.filter(
     p =>
       p.name.toLowerCase().toString() !=
@@ -451,4 +457,13 @@ exports.removeFromWatchlist = async (req, res) => {
     watchList: newWatchlist
   });
   res.send({ message: "removed from watchlist sucessfully" });
+};
+
+// display watchlist
+
+exports.watchlist = async (req, res) => {
+  const user = await User.findOne({ mobile: req.body.mobile });
+  if (!user) return res.send({ message: "user not valid" });
+  const userWatchlist = await user.watchList;
+  res.send(userWatchlist);
 };

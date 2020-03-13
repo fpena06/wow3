@@ -58,4 +58,8 @@ router.post(
   User.removeFromWatchlist
 );
 
+// display watchlist
+
+router.post("/watchlist", Auth.auth.checkToken, User.watchlist);
+
 module.exports = router;
