@@ -134,13 +134,33 @@ exports.leaderboard = async (req, res) => {
 // transactions
 
 exports.transaction = async (req, res) => {
-  const userTransaction = await Transaction.find({
-    userID: req.body.User_id
+  const userTransactions = await Transaction.find({ userID: req.body.User_id });
+
+  let userTransaction = userTransactions.map(async t => {
+    let company = await Company.findById(t.companyID);
+    let sharePrice = t.shareAmount / t.shareCount;
+
+    let obj = {
+      time: t.time,
+      companyName: company.name,
+      sharePrice: sharePrice,
+      shareQuantity: t.shareCount,
+      totalAmount: t.shareAmount
+    };
+    return obj;
   });
-  const user = await User.findOne({
-    _id: req.body.User_id
+
+  let user = await User.findById(req.body.User_id);
+
+  let userCurrentHoldings = user.currentHoldings.map(async c => {
+    let company = await Company.findById(c.Company_id);
+    let obj = {
+      companyName: company.name,
+      shareCount: c.shareCount
+    };
+    return obj;
   });
-  const userCurrentHoldings = await user.currentHoldings;
+
   return res.send({ userTransaction, userCurrentHoldings });
 };
 
