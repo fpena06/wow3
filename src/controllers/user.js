@@ -426,7 +426,7 @@ exports.addToWatchlist = async (req, res) => {
       watchList: [
         ...user.watchList,
         {
-          _id: company._id,
+          Company_id: company._id,
           name: company.name,
           shareValue: company.shareValue,
           shareValuePercentage

@@ -8,6 +8,7 @@ const UserSchema = mongoose.Schema({
   walletAmount: { type: Number, default: 100000 },
   watchList: [
     {
+      Company_id: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
       name: { type: String },
       shareValue: { type: Number },
       shareValuePercentage: { type: Number }
