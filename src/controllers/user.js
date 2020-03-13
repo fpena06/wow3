@@ -137,9 +137,11 @@ exports.transaction = async (req, res) => {
   const userTransactions = await Transaction.find({ userID: req.body.User_id });
 
   let userTransaction = [];
+  let userCurrentHoldings = [];
   let company;
   let sharePrice;
   let t;
+  let c;
 
   for (let i = 0; i < userTransactions.length; i++) {
     t = userTransactions[i];
@@ -156,38 +158,29 @@ exports.transaction = async (req, res) => {
     });
   }
 
-  console.log(userTransaction);
+  let user = await User.findById(req.body.User_id);
 
-  // let userTransaction = await userTransactions.map(async t => {
-  //   let company = await Company.findById(t.companyID.toString());
-  //   let sharePrice = t.shareAmount / t.shareCount;
+  for (let i = 0; i < user.currentHoldings.length; i++) {
+    c = user.currentHoldings[i];
+    company = await Company.findById(c.Company_id.toString());
 
+    userCurrentHoldings.push({
+      companyName: company.name,
+      shareCount: c.shareCount
+    });
+  }
+
+  // let userCurrentHoldings = await user.currentHoldings.map(async c => {
+  //   let
   //   let obj = await {
-  //     time: t.time,
   //     companyName: company.name,
-  //     sharePrice: sharePrice,
-  //     shareQuantity: t.numberOfShares,
-  //     totalAmount: t.shareAmount
+  //     shareCount: c.shareCount
   //   };
-
-  //   console.log("Transaction", obj);
-
+  //   console.log("CH", obj);
   //   return await obj;
   // });
 
-  let user = await User.findById(req.body.User_id);
-
-  let userCurrentHoldings = await user.currentHoldings.map(async c => {
-    let company = await Company.findById(c.Company_id.toString());
-    let obj = await {
-      companyName: company.name,
-      shareCount: c.shareCount
-    };
-    console.log("CH", obj);
-    return await obj;
-  });
-
-  console.log(userCurrentHoldings);
+  // console.log(userCurrentHoldings);
 
   return res.send({
     userTransaction: userTransaction,
