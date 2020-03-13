@@ -142,9 +142,10 @@ exports.transaction = async (req, res) => {
   let t;
 
   for (let i = 0; i < userTransactions.length; i++) {
+    t = userTransactions[i];
+
     company = await Company.findById(t.companyID.toString());
     sharePrice = t.shareAmount / t.numberOfShares;
-    t = userTransactions[i];
 
     userTransaction.push({
       time: t.time,
