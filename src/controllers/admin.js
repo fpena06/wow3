@@ -167,6 +167,7 @@ exports.addNews = async (req, res) => {
     description: req.body.description
   });
   await news.save();
+  res.io.emit("global", { news: news, type: "news" });
   res.send(news);
 };
 
