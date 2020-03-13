@@ -450,7 +450,7 @@ exports.removeFromWatchlist = async (req, res) => {
   if (!checkWatchlist)
     return res.send({ message: "company not present in watchlist" });
   let newWatchlist = user.watchList.filter(
-    p => p.name.toLowerCase().toString() != company.name.toString()
+    p => p.name.toString() != company.name.toString()
   );
   await User.findByIdAndUpdate(user._id, {
     watchList: newWatchlist
