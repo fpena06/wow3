@@ -418,7 +418,9 @@ exports.addToWatchlist = async (req, res) => {
     const shareValueChange =
       company.shareValue -
       company.previousValue[company.previousValue.length - 1].value;
-    const shareValuePercentage = (shareValueChange / company.shareValue) * 100;
+    const shareValuePercentage = Number(
+      (shareValueChange / company.shareValue) * 100
+    );
     await User.findByIdAndUpdate(user._id, {
       watchList: [
         ...user.watchList,
