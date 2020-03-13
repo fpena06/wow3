@@ -419,7 +419,7 @@ exports.addToWatchlist = async (req, res) => {
       company.shareValue -
       company.previousValue[company.previousValue.length - 1].value;
     const shareValuePercentage = Number(
-      (shareValueChange / company.shareValue) * 100
+      ((shareValueChange / company.shareValue) * 100).toFixed()
     );
     await User.findByIdAndUpdate(user._id, {
       watchList: [
