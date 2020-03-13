@@ -464,8 +464,8 @@ exports.removeFromWatchlist = async (req, res) => {
   await User.findByIdAndUpdate(user._id, {
     watchList: newWatchlist
   });
-  const User_mobile = await User.findById(user._id).select("mobile");
   const user1 = await User.findById(user._id);
+  const User_mobile = user1.mobile;
   const watchList = user1.watchList;
   await res.io.emit("user", {
     User_mobile: User_mobile,
