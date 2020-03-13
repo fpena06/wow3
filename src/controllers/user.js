@@ -525,3 +525,23 @@ exports.watchlist = async (req, res) => {
   const userWatchlist = await user.watchList;
   res.send(userWatchlist);
 };
+
+// stockbar
+
+exports.stockbar = async (req, res) => {
+  const companies = await Company.find();
+  let stockbar = [];
+  for (let i = 0; i < companies.length; i++) {
+    let company = companies[i];
+    let changeValue =
+      company.shareValue -
+      company.previousValue[company.previousValue.length - 1].value;
+    let status = changeValue >= 0 ? "up" : "down";
+    let obj = {
+      companyName: company.name,
+      stat: status
+    };
+    stockbar.push(obj);
+  }
+  res.send({ stockbar });
+};

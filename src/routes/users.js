@@ -14,6 +14,10 @@ router.post("/changePassword", Auth.auth.checkToken, User.changePassword);
 
 router.post("/dashboard/stat", Auth.auth.checkToken, User.dashboard);
 
+// stock bar
+
+router.post("/stockbar", Auth.auth.checkToken, User.stockbar);
+
 // user dashboard after selecting category
 
 router.post(
