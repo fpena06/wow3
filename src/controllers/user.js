@@ -140,7 +140,7 @@ exports.transaction = async (req, res) => {
     let company = await Company.findById(t.companyID.toString());
     let sharePrice = t.shareAmount / t.shareCount;
 
-    let obj = {
+    let obj = await {
       time: t.time,
       companyName: company.name,
       sharePrice: sharePrice,
@@ -150,19 +150,19 @@ exports.transaction = async (req, res) => {
 
     console.log("Transaction", obj);
 
-    return obj;
+    return await obj;
   });
 
   let user = await User.findById(req.body.User_id);
 
   let userCurrentHoldings = await user.currentHoldings.map(async c => {
     let company = await Company.findById(c.Company_id.toString());
-    let obj = {
+    let obj = await {
       companyName: company.name,
       shareCount: c.shareCount
     };
     console.log("CH", obj);
-    return obj;
+    return await obj;
   });
 
   console.log(userCurrentHoldings);
