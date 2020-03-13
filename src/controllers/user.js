@@ -136,7 +136,7 @@ exports.leaderboard = async (req, res) => {
 exports.transaction = async (req, res) => {
   const userTransactions = await Transaction.find({ userID: req.body.User_id });
 
-  let userTransaction = userTransactions.map(async t => {
+  let userTransaction = await userTransactions.map(async t => {
     let company = await Company.findById(t.companyID.toString());
     let sharePrice = t.shareAmount / t.shareCount;
 
@@ -144,28 +144,31 @@ exports.transaction = async (req, res) => {
       time: t.time,
       companyName: company.name,
       sharePrice: sharePrice,
-      shareQuantity: t.shareCount,
+      shareQuantity: t.numberOfShares,
       totalAmount: t.shareAmount
     };
 
-    console.log(obj);
+    console.log("Transaction", obj);
 
     return obj;
   });
 
   let user = await User.findById(req.body.User_id);
 
-  let userCurrentHoldings = user.currentHoldings.map(async c => {
+  let userCurrentHoldings = await user.currentHoldings.map(async c => {
     let company = await Company.findById(c.Company_id.toString());
     let obj = {
       companyName: company.name,
       shareCount: c.shareCount
     };
-    console.log(obj);
+    console.log("CH", obj);
     return obj;
   });
 
-  return res.send({ userTransaction, userCurrentHoldings });
+  return res.send({
+    userTransaction: userTransaction,
+    userCurrentHoldings: userCurrentHoldings
+  });
 };
 
 //buy shares
