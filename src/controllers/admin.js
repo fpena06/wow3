@@ -161,7 +161,7 @@ exports.updateCompanyShareValue = async (req, res) => {
       type: "stockbar"
     });
     res.io.emit("global", { company: company, type: "company" });
-    res.send({ company, status });
+    res.send({ message: "Updated successfully" });
   } else return res.send({ message: "No such company exist" });
 };
 
