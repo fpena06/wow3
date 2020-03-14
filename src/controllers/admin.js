@@ -39,7 +39,9 @@ exports.login = async (req, res) => {
         { mobile: req.body.mobile, password: req.body.password },
         config.get("TOKEN")
       );
-      res.header("x-auth-token", token).send("Suceefully logged in ..."); // Token to be included after generation
+      res
+        .header("x-auth-token", token)
+        .send({ message: "Suceefully logged in ...", user: admin }); // Token to be included after generation
     }
   }
 };
