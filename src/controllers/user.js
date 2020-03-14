@@ -146,6 +146,7 @@ exports.leaderboard = async (req, res) => {
     .select(["name", "walletAmount"]);
 
   let rank = leaderboardUsers.findIndex(p => p.mobile === user.mobile);
+  console.log(rank);
   return res.send({ leaderboardUsers, rank });
 };
 
