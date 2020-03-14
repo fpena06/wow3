@@ -234,7 +234,7 @@ exports.newsDisplay = async (req, res) => {
   const news = await News.find()
     .limit(2)
     .sort({ time: -1 });
-  res.send({ message: "news added ", news });
+  res.send({ message: "news added ", news: news });
 };
 
 // leaderboard
