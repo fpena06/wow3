@@ -61,7 +61,7 @@ exports.dashboardCategory = async (req, res) => {
   const companyCategory = await Company.find({
     category: req.body.category
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
-
+  console.log("ladnscm");
   return res.send({ companies: companyCategory });
 };
 
