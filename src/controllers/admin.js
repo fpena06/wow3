@@ -136,7 +136,21 @@ exports.updateCompanyShareValue = async (req, res) => {
       }
     }
     company = await Company.findById(req.body.Company_id);
-    // await res.io.emit("global", { company: company, type: "company" });
+    const grossingCompany = await Company.find()
+      .sort({ shareValue: -1 })
+      .limit(1)
+      .select("name");
+    const leaderboardTop = await User.find()
+      .sort({ walletAmount: -1 })
+      .limit(1)
+      .select(["name", "walletAmount"]);
+    const global = {
+      leaderboardTop,
+      grossingCompany
+    };
+
+    await res.io.emit("global", { global: global, type: "stat" });
+
     res.io.emit("global", {
       company: company,
       status: status,
