@@ -196,7 +196,8 @@ exports.userDetails = async (req, res) => {
 
 exports.addNews = async (req, res) => {
   news = new News({
-    description: req.body.description
+    description: req.body.description,
+    time: new Date()
   });
   await news.save();
   res.io.emit("global", { news: news, type: "news" });
