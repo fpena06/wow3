@@ -28,9 +28,7 @@ exports.addAdmin = async (req, res) => {
 // admin login
 
 exports.login = async (req, res) => {
-  console.log(req.body);
   const admin = await Admin.findOne({ mobile: req.body.mobile });
-  console.log(admin);
   if (!admin) {
     return res.send("Invalid credentials  ...");
   } else {

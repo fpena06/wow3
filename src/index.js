@@ -64,6 +64,7 @@ app.get("/", (req, res) => {
 });
 app.use("/user", routes.user);
 app.use("/admin", routes.admin);
+app.use("/broker", routes.broker);
 
 // let port1 = process.env.PORT || 3001;
 let port2 = process.env.PORT || 4001;
