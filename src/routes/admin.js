@@ -14,6 +14,18 @@ router.post("/addUser", Admin.addUser);
 
 router.post("/login/admin", Admin.login);
 
+// admin dashboard
+
+router.post("/dashboard", Auth.auth.checkToken, Admin.dashboard);
+
+// admin dashboard
+
+router.post(
+  "/dashboardCategory",
+  Auth.auth.checkToken,
+  Admin.dashboardCategory
+);
+
 // add company
 
 router.post("/addCompany", Auth.auth.checkToken, Admin.addCompany);

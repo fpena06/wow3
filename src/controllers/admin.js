@@ -46,6 +46,25 @@ exports.login = async (req, res) => {
   }
 };
 
+// admin dashboard
+
+exports.dashboard = async (req, res) => {
+  let companies = await Company.find();
+
+  let uniqueCategory = [...new Set(companies.map(c => c.category))];
+  res.send(uniqueCategory);
+};
+
+//dashboard after selecting category
+
+exports.dashboardCategory = async (req, res) => {
+  const companyCategory = await Company.find({
+    category: req.body.category
+  }).select(["name", "shareValue", "shareCount", "previousValue"]);
+
+  return res.send({ companies: companyCategory });
+};
+
 // add company
 
 exports.addCompany = async (req, res) => {
