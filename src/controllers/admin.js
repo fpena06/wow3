@@ -176,9 +176,12 @@ exports.addUser = async (req, res) => {
     watchList: [],
     currentHoldings: []
   });
-  await user.save();
-  res.json({
-    message: "User added sucessfully"
+  await user.save(err => {
+    if (err) return res.send({ message: "User not created" });
+    else
+      res.json({
+        message: "User added sucessfully"
+      });
   });
 };
 
@@ -200,6 +203,9 @@ exports.addNews = async (req, res) => {
     time: new Date()
   });
   await news.save();
+  const news = await News.find()
+    .limit(10)
+    .sort({ time: -1 });
   res.io.emit("global", { news: news, type: "news" });
   res.send(news);
 };
