@@ -49,6 +49,7 @@ exports.brokerTip = async (req, res) => {
   User.findByIdAndUpdate(user._id, {
     walletAmount: walletAmount
   });
-  console.log("updated user: ", user._id);
+  let user1 = await User.findOne({ mobile: req.body.mobile });
+  console.log("updated user: ", user1);
   res.send({ message: "money deducted successfully " });
 };
