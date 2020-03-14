@@ -245,5 +245,8 @@ exports.transaction = async (req, res) => {
   const userTransaction = await Transaction.find({
     userID: user._id.toString()
   });
-  return res.send({ userTransaction });
+  return res.send({
+    message: "transaction list",
+    userTransaction: userTransaction
+  });
 };
