@@ -225,7 +225,7 @@ exports.addNews = async (req, res) => {
     .limit(10)
     .sort({ time: -1 });
   res.io.emit("global", { news: news1, type: "news" });
-  res.send(news);
+  res.send({ message: "News added in queue" });
 };
 
 // leaderboard
