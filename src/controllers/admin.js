@@ -242,10 +242,11 @@ exports.leaderboard = async (req, res) => {
 
 exports.transaction = async (req, res) => {
   let user = await User.find({ mobile: req.body.mobile });
+  console.log("user", user);
   const userTransactions = await Transaction.find({
     userID: user._id
   }).sort({ time: -1 });
-
+  console.log("usertransactions array:", userTransactions);
   let userTransaction = [];
   let company;
   let sharePrice;
@@ -265,7 +266,7 @@ exports.transaction = async (req, res) => {
       totalAmount: t.shareAmount
     });
   }
-  console.log(userTransaction);
+  console.log("usertransaction: ", userTransaction);
   return res.send({
     message: "transaction of user",
     userTransaction: userTransaction
