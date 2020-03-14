@@ -43,6 +43,8 @@ exports.login = async (req, res) => {
 
 exports.brokerTip = async (req, res) => {
   let user = await User.findOne({ mobile: req.body.mobile });
+  if (user.walletAmount < req.body.tipAmount)
+    return res.send({ message: "Do not have enough money" });
   User.findByIdAndUpdate(user._id, {
     walletAmount: user.walletAmount - req.body.tipAmount
   });
