@@ -140,7 +140,7 @@ exports.leaderboard = async (req, res) => {
     req.headers["x-access-token"],
     config.get("TOKEN")
   );
-
+  console.log(user);
   const leaderboardUsers = await User.find()
     .sort({ walletAmount: -1 })
     .select(["name", "walletAmount"]);
