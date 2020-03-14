@@ -127,7 +127,7 @@ exports.dashboardCategory = async (req, res) => {
 // news display
 
 exports.newsDisplay = async (req, res) => {
-  const news = await News.find();
+  const news = await News.find().limit(10);
   res.send(news);
 };
 
