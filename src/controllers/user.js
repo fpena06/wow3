@@ -140,13 +140,11 @@ exports.leaderboard = async (req, res) => {
     req.headers["x-access-token"],
     config.get("TOKEN")
   );
-  console.log(user);
   const leaderboardUsers = await User.find()
     .sort({ walletAmount: -1 })
-    .select(["name", "walletAmount"]);
+    .select(["name", "walletAmount", "mobile"]);
 
-  let rank = leaderboardUsers.findIndex(p => p.mobile === user.mobile);
-  console.log(rank);
+  let rank = leaderboardUsers.findIndex(p => p.mobile === user.mobile) + 1;
   return res.send({ leaderboardUsers, rank });
 };
 
