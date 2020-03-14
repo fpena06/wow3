@@ -232,7 +232,7 @@ exports.addNews = async (req, res) => {
 
 exports.newsDisplay = async (req, res) => {
   const news = await News.find()
-    .limit(2)
+    .limit(10)
     .sort({ time: -1 });
   res.send({ message: "news added ", news: news });
 };
