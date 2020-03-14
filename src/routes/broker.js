@@ -12,4 +12,6 @@ router.post("/login", Broker.login);
 
 // tip provide
 
-router.post("/brokerTip", Auth.auth.addBroker, Broker.brokerTip);
+router.post("/brokerTip", Auth.auth.checkToken, Broker.brokerTip);
+
+module.exports = router;
