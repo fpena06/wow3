@@ -241,12 +241,32 @@ exports.leaderboard = async (req, res) => {
 // transaction
 
 exports.transaction = async (req, res) => {
-  const user = await User.findOne({ mobile: req.body.mobile });
-  const userTransaction = await Transaction.find({
-    userID: user._id.toString()
-  });
+  let user = await User.find({ mobile: req.body.mobile });
+  const userTransactions = await Transaction.find({
+    userID: user._id
+  }).sort({ time: -1 });
+
+  let userTransaction = [];
+  let company;
+  let sharePrice;
+  let t;
+
+  for (let i = 0; i < userTransactions.length; i++) {
+    t = userTransactions[i];
+
+    company = await Company.findById(t.companyID.toString());
+    sharePrice = t.shareAmount / t.numberOfShares;
+
+    userTransaction.push({
+      time: t.time,
+      companyName: company.name,
+      sharePrice: sharePrice,
+      shareQuantity: t.numberOfShares,
+      totalAmount: t.shareAmount
+    });
+  }
   return res.send({
-    message: "transaction list",
+    message: "transaction of user",
     userTransaction: userTransaction
   });
 };
