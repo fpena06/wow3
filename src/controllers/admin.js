@@ -207,7 +207,7 @@ exports.userDetails = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile
   }).select(["name", "email", "password", "mobile"]);
-  if (!user) return res.send("user does not exist");
+  if (!user) return res.send({ message: "user does not exist" });
   res.send(user);
 };
 
