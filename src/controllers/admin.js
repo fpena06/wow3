@@ -203,10 +203,10 @@ exports.addNews = async (req, res) => {
     time: new Date()
   });
   await news.save();
-  const news = await News.find()
+  const news1 = await News.find()
     .limit(10)
     .sort({ time: -1 });
-  res.io.emit("global", { news: news, type: "news" });
+  res.io.emit("global", { news1: news, type: "news" });
   res.send(news);
 };
 
