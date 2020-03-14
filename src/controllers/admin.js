@@ -244,7 +244,7 @@ exports.transaction = async (req, res) => {
   let user = await User.find({ mobile: req.body.mobile });
   console.log("user", user);
   const userTransactions = await Transaction.find({
-    userID: user._id
+    userID: user._id.toString()
   }).sort({ time: -1 });
   console.log("usertransactions array:", userTransactions);
   let userTransaction = [];
