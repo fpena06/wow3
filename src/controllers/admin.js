@@ -128,7 +128,7 @@ exports.updateCompanyShareValue = async (req, res) => {
           });
           let updatedWatchlist = p.watchList;
           console.log("user watchlist before updation: ", p.watchList);
-          User.findByIdAndUpdate(p._id, {
+          await User.findByIdAndUpdate(p._id, {
             watchList: updatedWatchlist
           });
           console.log("user watchlist after updation: ", p.watchList);
