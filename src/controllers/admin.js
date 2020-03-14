@@ -112,22 +112,26 @@ exports.updateCompanyShareValue = async (req, res) => {
       shareValue: req.body.shareValue
     });
     let users = await User.find();
-    console.log(users);
-    let neededUsers = users.watchList.find(p => {
-      p.Company_id.toString() === req.body.Company_id.toString();
-    });
-    for (let i = 0; i < neededUsers.length; i++) {
-      let user1 = neededUsers[i];
-      let index = user1.findIndex(
-        p => p.Company_id.toString() === req.body.Company_id.toString()
-      );
-      user1.splice(index, 1, {
-        Company_id: req.body.Company_id,
-        name: company.name,
-        shareValue: req.body.shareValue,
-        shareValuePercentage: shareValuePercentage
-      });
-      await user1.save();
+    for (let j = 0; j < users.length; j++) {
+      let p = users[j];
+      for (let i = 0; i < p.watchList.length; i++) {
+        if (
+          p.watchList[i].Company_id.toString() ===
+          req.body.Company_id.toString()
+        ) {
+          let name = p.watchList[i].name;
+          p.watchList.splice(i, 1, {
+            Company_id: req.body.Company_id,
+            name: name,
+            shareValue: req.body.shareValue,
+            shareValuePercentage: shareValuePercentage
+          });
+          let updatedWatchlist = p.watchList;
+          User.findByIdAndUpdate(p._id, {
+            watchList: updatedWatchlist
+          });
+        }
+      }
     }
     company = await Company.findById(req.body.Company_id);
     // await res.io.emit("global", { company: company, type: "company" });
