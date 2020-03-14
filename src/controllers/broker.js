@@ -48,6 +48,6 @@ exports.brokerTip = async (req, res) => {
   User.findByIdAndUpdate(user._id, {
     walletAmount: user.walletAmount - req.body.tipAmount
   });
-  console.log("updated user: ", user);
+  console.log("updated user: ", user._id);
   res.send({ message: "money deducted successfully " });
 };
