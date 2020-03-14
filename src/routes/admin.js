@@ -26,6 +26,10 @@ router.post(
   Admin.updateCompanyShareValue
 );
 
+// get company
+
+router.post("/company", Auth.auth.checkToken, Admin.company);
+
 // get user details
 
 router.post("/userDetails", Auth.auth.checkToken, Admin.userDetails);

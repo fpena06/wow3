@@ -276,3 +276,10 @@ exports.transaction = async (req, res) => {
     userTransaction: userTransaction
   });
 };
+
+// get company
+
+exports.company = async (req, res) => {
+  let company = await Company.find();
+  res.send({ message: "Companies", company: company });
+};
