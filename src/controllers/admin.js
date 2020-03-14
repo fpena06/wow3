@@ -127,7 +127,7 @@ exports.updateCompanyShareValue = async (req, res) => {
             shareValuePercentage: shareValuePercentage
           });
           let updatedWatchlist = p.watchList;
-          console.log("updated watchlist: ", updatedWatchlist);
+          console.log("user watchlist before updation: ", p.watchList);
           User.findByIdAndUpdate(p._id, {
             watchList: updatedWatchlist
           });
