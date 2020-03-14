@@ -46,10 +46,8 @@ exports.brokerTip = async (req, res) => {
   if (user.walletAmount < req.body.tipAmount)
     return res.send({ message: "Do not have enough money" });
   let walletAmount = user.walletAmount - req.body.tipAmount;
-  User.findByIdAndUpdate(user._id, {
+  await User.findByIdAndUpdate(user._id, {
     walletAmount: walletAmount
   });
-  let user1 = await User.findOne({ mobile: req.body.mobile });
-  console.log("updated user: ", user1);
   res.send({ message: "money deducted successfully " });
 };
