@@ -210,7 +210,7 @@ exports.userDetails = async (req, res) => {
     mobile: req.body.mobile
   }).select(["name", "email", "password", "mobile"]);
   if (!user) return res.send({ message: "user does not exist" });
-  res.send(user);
+  res.send({ user: user });
 };
 
 // news updation
