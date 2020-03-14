@@ -183,12 +183,6 @@ exports.updateCompanyShareValue = async (req, res) => {
     res.send({ message: "Updated successfully" });
   } else return res.send({ message: "No such company exist" });
 };
-
-exports.dashboard = async (req, res) => {
-  const userList = await User.find({}, "name");
-  res.send(userList);
-};
-
 // add user
 
 exports.addUser = async (req, res) => {
