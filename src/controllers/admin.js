@@ -52,6 +52,8 @@ exports.dashboard = async (req, res) => {
   let companies = await Company.find();
 
   let uniqueCategory = [...new Set(companies.map(c => c.category))];
+  console.log("companies: ", companies);
+  console.log("unique category :", uniqueCategory);
   res.send(uniqueCategory);
 };
 
