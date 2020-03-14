@@ -215,7 +215,8 @@ exports.addNews = async (req, res) => {
 exports.leaderboard = async (req, res) => {
   const leaderboardUsers = await User.find()
     .sort({ walletAmount: -1 })
-    .select(["name", "walletAmount"]);
+    .select(["name", "walletAmount"])
+    .limit(80);
   return res.send(leaderboardUsers);
 };
 

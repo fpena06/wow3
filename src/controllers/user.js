@@ -136,10 +136,17 @@ exports.newsDisplay = async (req, res) => {
 //user leaderboard
 
 exports.leaderboard = async (req, res) => {
+  let user = await jwt.decode(
+    req.headers["x-access-token"],
+    config.get("TOKEN")
+  );
+
   const leaderboardUsers = await User.find()
     .sort({ walletAmount: -1 })
     .select(["name", "walletAmount"]);
-  return res.send(leaderboardUsers);
+
+  let rank = leaderboardUsers.findIndex(p => p.mobile === user.mobile) + 1;
+  return res.send({ leaderboardUsers, rank });
 };
 
 // transactions
