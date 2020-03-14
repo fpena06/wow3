@@ -265,6 +265,7 @@ exports.transaction = async (req, res) => {
       totalAmount: t.shareAmount
     });
   }
+  console.log(userTransaction);
   return res.send({
     message: "transaction of user",
     userTransaction: userTransaction
