@@ -34,6 +34,10 @@ router.post("/userDetails", Auth.auth.checkToken, Admin.userDetails);
 
 router.post("/addNews", Auth.auth.checkToken, Admin.addNews);
 
+// news section
+
+router.post("/news", Auth.auth.checkToken, Admin.newsDisplay);
+
 //user leaderboard
 
 router.post("/leaderboard", Auth.auth.checkToken, Admin.leaderboard);
@@ -41,5 +45,7 @@ router.post("/leaderboard", Auth.auth.checkToken, Admin.leaderboard);
 //user transaction
 
 router.post("/transaction", Auth.auth.checkToken, Admin.transaction);
+
+//
 
 module.exports = router;

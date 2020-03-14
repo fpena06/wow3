@@ -228,6 +228,15 @@ exports.addNews = async (req, res) => {
   res.send({ message: "News added in queue" });
 };
 
+//news display
+
+exports.newsDisplay = async (req, res) => {
+  const news = await News.find()
+    .limit(2)
+    .sort({ time: -1 });
+  res.send({ message: "news added ", news });
+};
+
 // leaderboard
 
 exports.leaderboard = async (req, res) => {
