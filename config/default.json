@@ -1,5 +1,5 @@
 {
   "TOKEN": "TokyoGhoul",
   "DBURL": "mongodb://localhost/wows3",
-  "ENDTIME": "new Date(2020, 2, 13, 20, 36, 0)"
+  "ENDTIME": "March 15, 2020 24:00:00"
 }
