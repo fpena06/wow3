@@ -387,7 +387,7 @@ exports.sellShares = async (req, res) => {
     userID: req.body.User_id,
     companyID: req.body.Company_id,
     time: new Date(),
-    type: "buy",
+    type: "sell",
     numberOfShares: req.body.shareCount,
     shareAmount: company.shareValue * req.body.shareCount
   });
