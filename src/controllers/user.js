@@ -173,7 +173,8 @@ exports.transaction = async (req, res) => {
       companyName: company.name,
       sharePrice: sharePrice,
       shareQuantity: t.numberOfShares,
-      totalAmount: t.shareAmount
+      totalAmount: t.shareAmount,
+      type: t.type
     });
   }
 
