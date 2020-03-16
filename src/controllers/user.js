@@ -209,6 +209,11 @@ exports.buyShares = async (req, res) => {
     return res.send({ message: "Enter valid number of shares..." });
   if (user.walletAmount < shareAmount)
     return res.send({ message: "user do not have required amount..." });
+  var currentTime = new Date();
+
+  var currentOffset = currentTime.getTimezoneOffset();
+
+  var ISTOffset = 330;
   if (!currentHoldingsWanted) {
     company.shareCount = company.shareCount - req.body.shareCount;
     changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
@@ -274,12 +279,12 @@ exports.buyShares = async (req, res) => {
   transaction = new Transaction({
     userID: req.body.User_id,
     companyID: req.body.Company_id,
-    time: new Date(),
+    time: new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000),
     type: "buy",
     numberOfShares: req.body.shareCount,
     shareAmount: company.shareValue * req.body.shareCount
   });
-  await transaction.save();
+  transaction.save();
   const grossingCompany = await Company.findOne()
     .sort({ shareValue: -1 })
     .limit(1)
@@ -323,6 +328,11 @@ exports.sellShares = async (req, res) => {
     return res.send({ message: "do not have shares to sell" });
   if (currentHoldingsWanted.shareCount < req.body.shareCount)
     return res.send({ message: "do not have enough shares to sell" });
+  var currentTime = new Date();
+
+  var currentOffset = currentTime.getTimezoneOffset();
+
+  var ISTOffset = 330;
   if (currentHoldingsWanted.shareCount == req.body.shareCount) {
     let newHoldings = user.currentHoldings.filter(
       p => p.Company_id.toString() != req.body.Company_id.toString()
@@ -386,12 +396,12 @@ exports.sellShares = async (req, res) => {
   transaction = new Transaction({
     userID: req.body.User_id,
     companyID: req.body.Company_id,
-    time: new Date(),
+    time: new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000),
     type: "sell",
     numberOfShares: req.body.shareCount,
     shareAmount: company.shareValue * req.body.shareCount
   });
-  await transaction.save();
+  transaction.save();
   const grossingCompany = await Company.findOne()
     .sort({ shareValue: -1 })
     .limit(1)
