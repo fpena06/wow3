@@ -98,6 +98,7 @@ exports.addCompany = async (req, res) => {
       ]
     });
     await company.save();
+    console.log("company added");
     res.json({
       message: "Company added sucessfully"
     });
