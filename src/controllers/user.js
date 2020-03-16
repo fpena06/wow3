@@ -1,7 +1,6 @@
 let { User, Company, Transaction, News } = require("../models");
 const config = require("config");
 const jwt = require("jsonwebtoken");
-const helper = require("./helper");
 
 //get end time
 
@@ -281,7 +280,18 @@ exports.buyShares = async (req, res) => {
     shareAmount: company.shareValue * req.body.shareCount
   });
   await transaction.save();
-  const global = helper.global();
+  const grossingCompany = await Company.findOne()
+    .sort({ shareValue: -1 })
+    .limit(1)
+    .select("name");
+  const leaderboardTop = await User.findOne()
+    .sort({ walletAmount: -1 })
+    .limit(1)
+    .select(["name", "walletAmount"]);
+  const global = {
+    leaderboardTop,
+    grossingCompany
+  };
   let companyFound = changedUser.currentHoldings.find(
     p => p.Company_id.toString() === company._id.toString()
   );
@@ -382,7 +392,18 @@ exports.sellShares = async (req, res) => {
     shareAmount: company.shareValue * req.body.shareCount
   });
   await transaction.save();
-  const global = helper.global();
+  const grossingCompany = await Company.findOne()
+    .sort({ shareValue: -1 })
+    .limit(1)
+    .select("name");
+  const leaderboardTop = await User.findOne()
+    .sort({ walletAmount: -1 })
+    .limit(1)
+    .select(["name", "walletAmount"]);
+  const global = {
+    leaderboardTop,
+    grossingCompany
+  };
   let companyFound = await changedUser.currentHoldings.find(
     p => p.Company_id.toString() === company._id.toString()
   );
