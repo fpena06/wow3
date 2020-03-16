@@ -216,7 +216,7 @@ exports.buyShares = async (req, res) => {
   var ISTOffset = 330;
   if (!currentHoldingsWanted) {
     company.shareCount = company.shareCount - req.body.shareCount;
-    changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
+    await Company.findByIdAndUpdate(req.body.Company_id, {
       shareCount: company.shareCount,
       currentHolders: [
         ...company.currentHolders,
@@ -226,7 +226,7 @@ exports.buyShares = async (req, res) => {
         }
       ]
     });
-    changedUser = await User.findByIdAndUpdate(req.body.User_id, {
+    await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: user.walletAmount - shareAmount,
       currentHoldings: [
         ...user.currentHoldings,
@@ -266,12 +266,12 @@ exports.buyShares = async (req, res) => {
 
     newHoldings.push(newObj);
     newHolders.push(newObjCompany);
-    changedUser = await User.findByIdAndUpdate(req.body.User_id, {
+    await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
 
-    changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
+    await Company.findByIdAndUpdate(req.body.Company_id, {
       shareCount: shareCount,
       currentHolders: newHolders
     });
@@ -297,6 +297,18 @@ exports.buyShares = async (req, res) => {
     leaderboardTop,
     grossingCompany
   };
+  changedCompany = await Company.findById(req.body.Company_id).select([
+    "_id",
+    "name",
+    "shareValue",
+    "shareCount",
+    "previousValue"
+  ]);
+  changedUser = await User.findById(req.body.User_id).select([
+    "walletAmount",
+    "mobile",
+    "currentHoldings"
+  ]);
   let companyFound = changedUser.currentHoldings.find(
     p => p.Company_id.toString() === company._id.toString()
   );
