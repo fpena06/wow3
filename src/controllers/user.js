@@ -202,13 +202,13 @@ exports.buyShares = async (req, res) => {
   const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
   const shareAmount = company.shareValue * req.body.shareCount;
+  const currentHoldingsWanted = user.currentHoldings.find(
+    p => p.Company_id.toString() === req.body.Company_id
+  );
   if (req.body.shareCount > company.shareCount)
     return res.send({ message: "Enter valid number of shares..." });
   if (user.walletAmount < shareAmount)
     return res.send({ message: "user do not have required amount..." });
-  const currentHoldingsWanted = user.currentHoldings.find(
-    p => p.Company_id.toString() === req.body.Company_id
-  );
   if (!currentHoldingsWanted) {
     company.shareCount = company.shareCount - req.body.shareCount;
     changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
@@ -335,12 +335,12 @@ exports.sellShares = async (req, res) => {
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
-    changedUser = await User.findByIdAndUpdate(req.body.User_id, {
+    await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
 
-    changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
+    await Company.findByIdAndUpdate(req.body.Company_id, {
       shareCount: company.shareCount + req.body.shareCount,
       currentHolders: newHolders
     });
@@ -373,12 +373,12 @@ exports.sellShares = async (req, res) => {
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
-    changedUser = await User.findByIdAndUpdate(req.body.User_id, {
+    await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
 
-    changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
+    await Company.findByIdAndUpdate(req.body.Company_id, {
       shareCount: company.shareCount + req.body.shareCount,
       currentHolders: newHolders
     });
@@ -404,6 +404,19 @@ exports.sellShares = async (req, res) => {
     leaderboardTop,
     grossingCompany
   };
+
+  changedCompany = await Company.findById(req.body.Company_id).select([
+    "_id",
+    "name",
+    "shareValue",
+    "shareCount",
+    "previousValue"
+  ]);
+  changedUser = await User.findById(req.body.User_id).select([
+    "walletAmount",
+    "mobile",
+    "currentHoldings"
+  ]);
   let companyFound = await changedUser.currentHoldings.find(
     p => p.Company_id.toString() === company._id.toString()
   );
