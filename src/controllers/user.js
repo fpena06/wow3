@@ -1,6 +1,7 @@
 let { User, Company, Transaction, News } = require("../models");
 const config = require("config");
 const jwt = require("jsonwebtoken");
+const helper = require("./helper");
 
 //get end time
 
@@ -198,21 +199,20 @@ exports.transaction = async (req, res) => {
 //buy shares
 
 exports.buyShares = async (req, res) => {
-  let changedUser;
+  let changedUser, changedCompany;
   const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
   const shareAmount = company.shareValue * req.body.shareCount;
-  const currentHoldingsWanted = user.currentHoldings.find(
-    p => p.Company_id.toString() === req.body.Company_id
-  );
   if (req.body.shareCount > company.shareCount)
     return res.send({ message: "Enter valid number of shares..." });
   if (user.walletAmount < shareAmount)
     return res.send({ message: "user do not have required amount..." });
+  const currentHoldingsWanted = user.currentHoldings.find(
+    p => p.Company_id.toString() === req.body.Company_id
+  );
   if (!currentHoldingsWanted) {
-    const shareAmount = company.shareValue * req.body.shareCount;
     company.shareCount = company.shareCount - req.body.shareCount;
-    await Company.findByIdAndUpdate(req.body.Company_id, {
+    changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
       shareCount: company.shareCount,
       currentHolders: [
         ...company.currentHolders,
@@ -222,7 +222,7 @@ exports.buyShares = async (req, res) => {
         }
       ]
     });
-    await User.findByIdAndUpdate(req.body.User_id, {
+    changedUser = await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: user.walletAmount - shareAmount,
       currentHoldings: [
         ...user.currentHoldings,
@@ -262,12 +262,12 @@ exports.buyShares = async (req, res) => {
 
     newHoldings.push(newObj);
     newHolders.push(newObjCompany);
-    await User.findByIdAndUpdate(req.body.User_id, {
+    changedUser = await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
 
-    await Company.findByIdAndUpdate(req.body.Company_id, {
+    changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
       shareCount: shareCount,
       currentHolders: newHolders
     });
@@ -281,32 +281,8 @@ exports.buyShares = async (req, res) => {
     shareAmount: company.shareValue * req.body.shareCount
   });
   await transaction.save();
-  const grossingCompany = await Company.find()
-    .sort({ shareValue: -1 })
-    .limit(1)
-    .select("name");
-  const leaderboardTop = await User.find()
-    .sort({ walletAmount: -1 })
-    .limit(1)
-    .select(["name", "walletAmount"]);
-  const global = {
-    leaderboardTop,
-    grossingCompany
-  };
-
-  changedCompany = await Company.findById(req.body.Company_id).select([
-    "_id",
-    "name",
-    "shareValue",
-    "shareCount",
-    "previousValue"
-  ]);
-  changedUser = await User.findById(req.body.User_id).select([
-    "walletAmount",
-    "mobile",
-    "currentHoldings"
-  ]);
-  let companyFound = await changedUser.currentHoldings.find(
+  const global = helper.global();
+  let companyFound = changedUser.currentHoldings.find(
     p => p.Company_id.toString() === company._id.toString()
   );
   let boughtVolume = companyFound.shareCount;
@@ -349,12 +325,12 @@ exports.sellShares = async (req, res) => {
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
-    await User.findByIdAndUpdate(req.body.User_id, {
+    changedUser = await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
 
-    await Company.findByIdAndUpdate(req.body.Company_id, {
+    changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
       shareCount: company.shareCount + req.body.shareCount,
       currentHolders: newHolders
     });
@@ -387,12 +363,12 @@ exports.sellShares = async (req, res) => {
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
-    await User.findByIdAndUpdate(req.body.User_id, {
+    changedUser = await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
 
-    await Company.findByIdAndUpdate(req.body.Company_id, {
+    changedCompany = await Company.findByIdAndUpdate(req.body.Company_id, {
       shareCount: company.shareCount + req.body.shareCount,
       currentHolders: newHolders
     });
@@ -406,31 +382,7 @@ exports.sellShares = async (req, res) => {
     shareAmount: company.shareValue * req.body.shareCount
   });
   await transaction.save();
-  const grossingCompany = await Company.find()
-    .sort({ shareValue: -1 })
-    .limit(1)
-    .select("name");
-  const leaderboardTop = await User.find()
-    .sort({ walletAmount: -1 })
-    .limit(1)
-    .select(["name", "walletAmount"]);
-  const global = {
-    leaderboardTop,
-    grossingCompany
-  };
-
-  changedCompany = await Company.findById(req.body.Company_id).select([
-    "_id",
-    "name",
-    "shareValue",
-    "shareCount",
-    "previousValue"
-  ]);
-  changedUser = await User.findById(req.body.User_id).select([
-    "walletAmount",
-    "mobile",
-    "currentHoldings"
-  ]);
+  const global = helper.global();
   let companyFound = await changedUser.currentHoldings.find(
     p => p.Company_id.toString() === company._id.toString()
   );
