@@ -71,6 +71,7 @@ exports.dashboard = async (req, res) => {
   for (let i = 0; i < user.currentHoldings.length; i++) {
     userShareAmount = userShareAmount + user.currentHoldings[i].shareAmount;
   }
+  console.log("User shareAmount: ", userShareAmount);
   const leaderboardTop = await User.find()
     .sort({ walletAmount: -1 })
     .limit(1)
