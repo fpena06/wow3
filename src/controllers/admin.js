@@ -160,11 +160,11 @@ exports.updateCompanyShareValue = async (req, res) => {
       }
     }
     company = await Company.findById(req.body.Company_id);
-    const grossingCompany = await Company.find()
+    const grossingCompany = await Company.findOne()
       .sort({ shareValue: -1 })
       .limit(1)
       .select("name");
-    const leaderboardTop = await User.find()
+    const leaderboardTop = await User.findOne()
       .sort({ walletAmount: -1 })
       .limit(1)
       .select(["name", "walletAmount"]);
