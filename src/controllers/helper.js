@@ -1,7 +1,7 @@
-let { User, Company, } = require("../models");
+let { User, Company } = require("../models");
 
-function global() { 
-    const grossingCompany = await Company.find()
+async function global() {
+  const grossingCompany = await Company.find()
     .sort({ shareValue: -1 })
     .limit(1)
     .select("name");
@@ -9,9 +9,9 @@ function global() {
     .sort({ walletAmount: -1 })
     .limit(1)
     .select(["name", "walletAmount"]);
- return {
+  return {
     leaderboardTop,
     grossingCompany
-  }
+  };
 }
 module.exports = { global: global };
