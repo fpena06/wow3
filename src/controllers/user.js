@@ -285,7 +285,7 @@ exports.buyShares = async (req, res) => {
     numberOfShares: req.body.shareCount,
     shareAmount: company.shareValue * req.body.shareCount
   });
-  transaction.save();
+  await transaction.save();
   const grossingCompany = await Company.findOne()
     .sort({ shareValue: -1 })
     .limit(1)
@@ -335,7 +335,7 @@ exports.sellShares = async (req, res) => {
   const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
   const currentHoldingsWanted = user.currentHoldings.find(
-    p => p.Company_id.toString() == req.body.Company_id
+    p => p.Company_id.toString() == req.body.Company_id.toString()
   );
   if (!currentHoldingsWanted)
     return res.send({ message: "do not have shares to sell" });
@@ -414,7 +414,7 @@ exports.sellShares = async (req, res) => {
     numberOfShares: req.body.shareCount,
     shareAmount: company.shareValue * req.body.shareCount
   });
-  transaction.save();
+  await transaction.save();
   const grossingCompany = await Company.findOne()
     .sort({ shareValue: -1 })
     .limit(1)
@@ -428,14 +428,14 @@ exports.sellShares = async (req, res) => {
     grossingCompany
   };
 
-  changedCompany = await Company.findById(req.body.Company_id).select([
+  const changedCompany = await Company.findById(req.body.Company_id).select([
     "_id",
     "name",
     "shareValue",
     "shareCount",
     "previousValue"
   ]);
-  changedUser = await User.findById(req.body.User_id).select([
+  const changedUser = await User.findById(req.body.User_id).select([
     "walletAmount",
     "mobile",
     "currentHoldings"
