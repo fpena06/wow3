@@ -159,28 +159,10 @@ exports.updateCompanyShareValue = async (req, res) => {
         }
       }
     }
-    company = await Company.findById(req.body.Company_id);
-    const grossingCompany = await Company.findOne()
-      .sort({ shareValue: -1 })
-      .limit(1)
-      .select("name");
-    const leaderboardTop = await User.findOne()
-      .sort({ walletAmount: -1 })
-      .limit(1)
-      .select(["name", "walletAmount"]);
-    const global = {
-      leaderboardTop,
-      grossingCompany
-    };
+    await res.io.emit("global", { type: "stat" });
 
-    await res.io.emit("global", { global: global, type: "stat" });
-
-    res.io.emit("global", {
-      company: company,
-      status: status,
-      type: "stockbar"
-    });
-    res.io.emit("global", { company: company, type: "company" });
+    res.io.emit("global", { type: "stockbar" });
+    res.io.emit("global", { type: "company" });
     res.send({ message: "Updated successfully" });
   } else return res.send({ message: "No such company exist" });
 };
@@ -235,10 +217,7 @@ exports.addNews = async (req, res) => {
     time: new Date()
   });
   await news.save();
-  const news1 = await News.find()
-    .limit(10)
-    .sort({ time: -1 });
-  res.io.emit("global", { news: news1, type: "news" });
+  res.io.emit("global", { type: "news" });
   res.send({ message: "News added in queue" });
 };
 

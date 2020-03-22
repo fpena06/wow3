@@ -199,7 +199,6 @@ exports.transaction = async (req, res) => {
 //buy shares
 
 exports.buyShares = async (req, res) => {
-  let changedUser, changedCompany;
   const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
   const shareAmount = company.shareValue * req.body.shareCount;
@@ -286,46 +285,10 @@ exports.buyShares = async (req, res) => {
     shareAmount: company.shareValue * req.body.shareCount
   });
   await transaction.save();
-  const grossingCompany = await Company.findOne()
-    .sort({ shareValue: -1 })
-    .limit(1)
-    .select("name");
-  const leaderboardTop = await User.findOne()
-    .sort({ walletAmount: -1 })
-    .limit(1)
-    .select(["name", "walletAmount"]);
-  const global = {
-    leaderboardTop,
-    grossingCompany
-  };
-  changedCompany = await Company.findById(req.body.Company_id).select([
-    "_id",
-    "name",
-    "shareValue",
-    "shareCount",
-    "previousValue"
-  ]);
-  changedUser = await User.findById(req.body.User_id).select([
-    "walletAmount",
-    "mobile",
-    "currentHoldings"
-  ]);
-  let companyFound = changedUser.currentHoldings.find(
-    p => p.Company_id.toString() === company._id.toString()
-  );
-  let boughtVolume = companyFound.shareCount;
-  await res.io.emit("user", {
-    user: changedUser,
-    boughtVolume: boughtVolume,
-    company: changedCompany,
-    type: "company"
-  });
-  await res.io.emit("global", { company: changedCompany, type: "company" });
-  await res.io.emit("global", { global: global, type: "stat" });
-  await res.io.emit("user", {
-    user: changedUser,
-    type: "stat"
-  });
+  await res.io.emit("user", { type: "company" });
+  await res.io.emit("global", { type: "company" });
+  await res.io.emit("global", { type: "stat" });
+  await res.io.emit("user", { type: "stat" });
   res.send({ message: "Shares bought sucessfully..." });
 };
 
@@ -415,47 +378,10 @@ exports.sellShares = async (req, res) => {
     shareAmount: company.shareValue * req.body.shareCount
   });
   await transaction.save();
-  const grossingCompany = await Company.findOne()
-    .sort({ shareValue: -1 })
-    .limit(1)
-    .select("name");
-  const leaderboardTop = await User.findOne()
-    .sort({ walletAmount: -1 })
-    .limit(1)
-    .select(["name", "walletAmount"]);
-  const global = {
-    leaderboardTop,
-    grossingCompany
-  };
-
-  const changedCompany = await Company.findById(req.body.Company_id).select([
-    "_id",
-    "name",
-    "shareValue",
-    "shareCount",
-    "previousValue"
-  ]);
-  const changedUser = await User.findById(req.body.User_id).select([
-    "walletAmount",
-    "mobile",
-    "currentHoldings"
-  ]);
-  let companyFound = await changedUser.currentHoldings.find(
-    p => p.Company_id.toString() === company._id.toString()
-  );
-  let boughtVolume = companyFound ? companyFound.shareCount : 0;
-  await res.io.emit("user", {
-    user: changedUser,
-    boughtVolume: boughtVolume,
-    company: changedCompany,
-    type: "company"
-  });
-  await res.io.emit("global", { company: changedCompany, type: "company" });
-  await res.io.emit("global", { global: global, type: "stat" });
-  await res.io.emit("user", {
-    user: changedUser,
-    type: "stat"
-  });
+  await res.io.emit("user", { type: "company" });
+  await res.io.emit("global", { type: "company" });
+  await res.io.emit("global", { type: "stat" });
+  await res.io.emit("user", { type: "stat" });
   res.send({ message: "Shares Sold Successfully" });
 };
 
@@ -497,11 +423,7 @@ exports.addToWatchlist = async (req, res) => {
   const user1 = await User.findById(user._id);
   const User_mobile = user1.mobile;
   const watchList = user1.watchList;
-  await res.io.emit("user", {
-    User_mobile: User_mobile,
-    watchList: watchList,
-    type: "watchlist"
-  });
+  await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "added to watchlist sucessfully" });
 };
 
@@ -527,11 +449,7 @@ exports.removeFromWatchlist = async (req, res) => {
   const user1 = await User.findById(user._id);
   const User_mobile = user1.mobile;
   const watchList = user1.watchList;
-  await res.io.emit("user", {
-    User_mobile: User_mobile,
-    watchList: watchList,
-    type: "watchlist"
-  });
+  await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "removed from watchlist sucessfully" });
 };
 
