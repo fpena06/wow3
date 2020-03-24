@@ -4,12 +4,6 @@ const CompanySchema = mongoose.Schema({
   name: { type: String, unique: true },
   category: String,
   shareValue: Number,
-  currentHolders: [
-    {
-      User_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      shareCount: { type: Number }
-    }
-  ],
   shareCount: Number,
   previousValue: [{ value: { type: Number }, time: Date }]
 });

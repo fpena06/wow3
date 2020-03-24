@@ -52,8 +52,6 @@ exports.dashboard = async (req, res) => {
   let companies = await Company.find();
 
   let uniqueCategory = [...new Set(companies.map(c => c.category))];
-  console.log("companies: ", companies);
-  console.log("unique category :", uniqueCategory);
   res.send(uniqueCategory);
 };
 
@@ -63,7 +61,6 @@ exports.dashboardCategory = async (req, res) => {
   const companyCategory = await Company.find({
     category: req.body.category
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
-  console.log("ladnscm");
   return res.send({ companies: companyCategory });
 };
 
@@ -77,7 +74,6 @@ exports.addCompany = async (req, res) => {
   var ISTOffset = 330;
   let { error } = await companyValidation(req.body);
   if (error) {
-    console.log(error);
     return res.send("Error", error.details[0].message);
   }
   let company = await Company.findOne({ name: req.body.name });
@@ -86,7 +82,6 @@ exports.addCompany = async (req, res) => {
       name: req.body.name,
       category: req.body.category,
       shareValue: req.body.shareValue,
-      currentHolders: [],
       shareCount: req.body.shareCount,
       previousValue: [
         {
@@ -98,7 +93,6 @@ exports.addCompany = async (req, res) => {
       ]
     });
     await company.save();
-    console.log("company added");
     res.json({
       message: "Company added sucessfully"
     });
@@ -118,11 +112,8 @@ exports.updateCompanyShareValue = async (req, res) => {
   if (company) {
     let changeValue = req.body.shareValue - company.shareValue;
     let shareValuePercentage = (changeValue / company.shareValue) * 100;
-    let status;
     if (changeValue === 0)
       return res.send({ message: "previous and current value cannot be same" });
-    else if (changeValue < 0) status = "down";
-    else status = "up";
     await Company.findByIdAndUpdate(req.body.Company_id, {
       previousValue: [
         ...company.previousValue,
@@ -151,11 +142,9 @@ exports.updateCompanyShareValue = async (req, res) => {
             shareValuePercentage: shareValuePercentage
           });
           let updatedWatchlist = p.watchList;
-          console.log("user watchlist before updation: ", p.watchList);
           await User.findByIdAndUpdate(p._id, {
             watchList: updatedWatchlist
           });
-          console.log("user watchlist after updation: ", p.watchList);
         }
       }
     }
@@ -171,7 +160,6 @@ exports.updateCompanyShareValue = async (req, res) => {
 exports.addUser = async (req, res) => {
   let { error } = await userValidation(req.body);
   if (error) {
-    console.log(error);
     return res.send("Error", error.details[0].message);
   }
   let user = await User.findOne({

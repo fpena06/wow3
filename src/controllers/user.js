@@ -202,7 +202,7 @@ exports.buyShares = async (req, res) => {
   const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
   const shareAmount = company.shareValue * req.body.shareCount;
-  const currentHoldingsWanted = user.currentHoldings.find(
+  const currentHoldingsWanted = user.currentHoldings.findOne(
     p => p.Company_id.toString() === req.body.Company_id
   );
   if (req.body.shareCount > company.shareCount)
@@ -217,14 +217,7 @@ exports.buyShares = async (req, res) => {
   if (!currentHoldingsWanted) {
     company.shareCount = company.shareCount - req.body.shareCount;
     await Company.findByIdAndUpdate(req.body.Company_id, {
-      shareCount: company.shareCount,
-      currentHolders: [
-        ...company.currentHolders,
-        {
-          User_id: req.body.User_id,
-          shareCount: req.body.shareCount
-        }
-      ]
+      shareCount: company.shareCount
     });
     await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: user.walletAmount - shareAmount,
@@ -246,10 +239,6 @@ exports.buyShares = async (req, res) => {
       p => p.Company_id.toString() != req.body.Company_id.toString()
     );
 
-    let newHolders = company.currentHolders.filter(p => {
-      return p.User_id.toString() != req.body.User_id.toString();
-    });
-
     let newObj = {
       Company_id: req.body.Company_id,
       sharePrice: company.shareValue,
@@ -259,21 +248,14 @@ exports.buyShares = async (req, res) => {
       shareCount: currentHoldingsWanted.shareCount + req.body.shareCount
     };
 
-    let newObjCompany = {
-      User_id: req.body.User_id,
-      shareCount: currentHoldingsWanted.shareCount + req.body.shareCount
-    };
-
     newHoldings.push(newObj);
-    newHolders.push(newObjCompany);
     await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: walletAmount,
       currentHoldings: newHoldings
     });
 
     await Company.findByIdAndUpdate(req.body.Company_id, {
-      shareCount: shareCount,
-      currentHolders: newHolders
+      shareCount: shareCount
     });
   }
   transaction = new Transaction({
@@ -314,10 +296,6 @@ exports.sellShares = async (req, res) => {
       p => p.Company_id.toString() != req.body.Company_id.toString()
     );
 
-    let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != req.body.User_id.toString()
-    );
-
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
 
@@ -327,16 +305,11 @@ exports.sellShares = async (req, res) => {
     });
 
     await Company.findByIdAndUpdate(req.body.Company_id, {
-      shareCount: company.shareCount + req.body.shareCount,
-      currentHolders: newHolders
+      shareCount: company.shareCount + req.body.shareCount
     });
   } else {
     let newHoldings = user.currentHoldings.filter(
       p => p.Company_id.toString() != req.body.Company_id.toString()
-    );
-
-    let newHolders = company.currentHolders.filter(
-      p => p.User_id.toString() != req.body.User_id.toString()
     );
 
     let newObj = {
@@ -348,13 +321,7 @@ exports.sellShares = async (req, res) => {
       shareCount: currentHoldingsWanted.shareCount - req.body.shareCount
     };
 
-    let newObjCompany = {
-      User_id: req.body.User_id,
-      shareCount: currentHoldingsWanted.shareCount - req.body.shareCount
-    };
-
     newHoldings.push(newObj);
-    newHolders.push(newObjCompany);
 
     let walletAmount =
       company.shareValue * req.body.shareCount + user.walletAmount;
@@ -365,8 +332,7 @@ exports.sellShares = async (req, res) => {
     });
 
     await Company.findByIdAndUpdate(req.body.Company_id, {
-      shareCount: company.shareCount + req.body.shareCount,
-      currentHolders: newHolders
+      shareCount: company.shareCount + req.body.shareCount
     });
   }
   transaction = new Transaction({
@@ -420,9 +386,6 @@ exports.addToWatchlist = async (req, res) => {
       ]
     });
   } else return res.send({ message: "company already exist in watchlist" });
-  const user1 = await User.findById(user._id);
-  const User_mobile = user1.mobile;
-  const watchList = user1.watchList;
   await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "added to watchlist sucessfully" });
 };
@@ -446,9 +409,6 @@ exports.removeFromWatchlist = async (req, res) => {
   await User.findByIdAndUpdate(user._id, {
     watchList: newWatchlist
   });
-  const user1 = await User.findById(user._id);
-  const User_mobile = user1.mobile;
-  const watchList = user1.watchList;
   await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "removed from watchlist sucessfully" });
 };
