@@ -388,7 +388,7 @@ exports.sellShares = async (req, res) => {
   await res.io.emit("global", { type: "company" });
   await res.io.emit("global", { type: "stat" });
   await res.io.emit("user", { type: "stat" });
-  res.send({ message: "Shares bought sucessfully..." });
+  res.send({ message: "Shares Sold Successfully" });
 };
 
 // exports.sellShares = async (req, res) => {
@@ -459,11 +459,11 @@ exports.sellShares = async (req, res) => {
 //     shareAmount: company.shareValue * req.body.shareCount
 //   });
 //   await transaction.save();
-//   await res.io.emit("user", { type: "company" });
-//   await res.io.emit("global", { type: "company" });
-//   await res.io.emit("global", { type: "stat" });
-//   await res.io.emit("user", { type: "stat" });
-//   res.send({ message: "Shares Sold Successfully" });
+// await res.io.emit("user", { type: "company" });
+// await res.io.emit("global", { type: "company" });
+// await res.io.emit("global", { type: "stat" });
+// await res.io.emit("user", { type: "stat" });
+// res.send({ message: "Shares Sold Successfully" });
 // };
 
 // add to watchlist
