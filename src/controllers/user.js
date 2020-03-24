@@ -341,11 +341,14 @@ exports.sellShares = async (req, res) => {
       $pull: { currentHoldings: { Company_id: req.body.Company_id } }
     });
   } else {
+    const existingCompany = existingCompanies.currentHoldings.find(
+      c => c.Company_id.toString() === req.body.Company_id
+    );
     newCurrentHolding = {
       Company_id: req.body.Company_id,
       sharePrice: companyShareValue,
       shareAmount: calculatedShareAmt,
-      shareCount: existingCompanies.shareCount - userShareCount
+      shareCount: existingCompany.shareCount - userShareCount
     };
 
     await User.findByIdAndUpdate(req.body.User_id, {
