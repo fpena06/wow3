@@ -198,6 +198,99 @@ exports.transaction = async (req, res) => {
 
 //buy shares
 
+hello = async (req, res) => {
+  console.log("***** Buy Share Logs *****");
+  let d1 = new Date().getTime();
+  const user = await User.findById(req.body.User_id)
+    .select(["walletAmount", "currentHoldings"])
+    .lean();
+
+  const userCurrentWalletAmt = user.walletAmount;
+
+  const company = await Company.findById(req.body.Company_id)
+    .select(["shareValue", "shareCount"])
+    .lean();
+
+  const companyShareValue = company.shareValue;
+  const companyShareCount = company.shareCount;
+  const userShareCount = req.body.shareCount;
+  const calculatedShareAmt = companyShareValue * userShareCount;
+
+  const newWalletAmt = userCurrentWalletAmt - calculatedShareAmt;
+  let newCurrentHolding;
+
+  if (userShareCount > companyShareCount) {
+    return res.send({ message: "Enter valid number of shares..." });
+  }
+
+  if (userCurrentWalletAmt < calculatedShareAmt) {
+    return res.send({ message: "user do not have required amount..." });
+  }
+
+  const existingCompanies = await User.findOne({
+    _id: req.body.User_id,
+    "currentHoldings.Company_id": req.body.Company_id
+  }).select("currentHoldings");
+
+  if (!existingCompanies) {
+    newCurrentHolding = {
+      Company_id: req.body.Company_id,
+      sharePrice: companyShareValue,
+      shareAmount: calculatedShareAmt,
+      shareCount: userShareCount
+    };
+    await User.findByIdAndUpdate(req.body.User_id, {
+      walletAmount: newWalletAmt,
+      $push: { currentHoldings: newCurrentHolding }
+    });
+  } else {
+    const existingCompany = existingCompanies.currentHoldings.find(
+      c => c.Company_id.toString() === req.body.Company_id
+    );
+
+    newCurrentHolding = {
+      Company_id: req.body.Company_id,
+      sharePrice: companyShareValue,
+      shareAmount: calculatedShareAmt,
+      shareCount: existingCompany.shareCount + userShareCount
+    };
+
+    await User.findByIdAndUpdate(req.body.User_id, {
+      $pull: { currentHoldings: { Company_id: req.body.Company_id } }
+    });
+
+    await User.findByIdAndUpdate(req.body.User_id, {
+      walletAmount: newWalletAmt,
+      $push: { currentHoldings: newCurrentHolding }
+    });
+  }
+
+  await Company.findByIdAndUpdate(req.body.Company_id, {
+    shareCount: companyShareCount - userShareCount
+  });
+
+  const currentTime = new Date();
+  const currentOffset = currentTime.getTimezoneOffset();
+  const ISTOffset = 330;
+
+  let transaction = new Transaction({
+    userID: req.body.User_id,
+    companyID: req.body.Company_id,
+    time: new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000),
+    type: "buy",
+    numberOfShares: userShareCount,
+    shareAmount: calculatedShareAmt
+  });
+
+  await transaction.save();
+
+  let d2 = new Date().getTime();
+
+  console.log(`${d2} - ${d1} = ${d2 - d1}`);
+  console.log("************************");
+  res.json({ message: "Shares bought sucessfully..." });
+};
+
 exports.buyShares = async (req, res) => {
   const user = await User.findById(req.body.User_id);
   const company = await Company.findById(req.body.Company_id);
@@ -205,6 +298,7 @@ exports.buyShares = async (req, res) => {
   const currentHoldingsWanted = user.currentHoldings.find(
     p => p.Company_id.toString() === req.body.Company_id
   );
+
   if (req.body.shareCount > company.shareCount)
     return res.send({ message: "Enter valid number of shares..." });
   if (user.walletAmount < shareAmount)
