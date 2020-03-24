@@ -331,7 +331,7 @@ exports.sellShares = async (req, res) => {
     p => p.Company_id.toString() == req.body.Company_id.toString()
   );
 
-  if (shareAvilWithUser < req.body.shareCount) {
+  if (shareAvilWithUser.shareCount < req.body.shareCount) {
     return res.send({ message: "user do not have required shares..." });
   }
 
