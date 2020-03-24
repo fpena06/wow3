@@ -298,79 +298,170 @@ exports.buyShares = async (req, res) => {
 //sell shares
 
 exports.sellShares = async (req, res) => {
-  const user = await User.findById(req.body.User_id);
-  const company = await Company.findById(req.body.Company_id);
-  const currentHoldingsWanted = user.currentHoldings.find(
+  console.log("***** Sell Share Logs *****");
+  let d1 = new Date().getTime();
+  const user = await User.findById(req.body.User_id)
+    .select(["walletAmount", "currentHoldings"])
+    .lean();
+
+  const userCurrentWalletAmt = user.walletAmount;
+
+  const company = await Company.findById(req.body.Company_id)
+    .select(["shareValue", "shareCount"])
+    .lean();
+
+  const companyShareValue = company.shareValue;
+  const companyShareCount = company.shareCount;
+  const userShareCount = req.body.shareCount;
+  const calculatedShareAmt = companyShareValue * userShareCount;
+
+  const newWalletAmt = userCurrentWalletAmt + calculatedShareAmt;
+  let newCurrentHolding;
+
+  const existingCompanies = await User.findOne({
+    _id: req.body.User_id,
+    "currentHoldings.Company_id": req.body.Company_id
+  }).select("currentHoldings");
+
+  const shareAvilWithUser = existingCompanies.currentHoldings.find(
     p => p.Company_id.toString() == req.body.Company_id.toString()
   );
-  if (!currentHoldingsWanted)
-    return res.send({ message: "do not have shares to sell" });
-  if (currentHoldingsWanted.shareCount < req.body.shareCount)
-    return res.send({ message: "do not have enough shares to sell" });
-  var currentTime = new Date();
 
-  var currentOffset = currentTime.getTimezoneOffset();
+  if (!existingCompanies) {
+    return res.send({ message: "Do not have shares to sell..." });
+  }
 
-  var ISTOffset = 330;
-  if (currentHoldingsWanted.shareCount == req.body.shareCount) {
-    let newHoldings = user.currentHoldings.filter(
-      p => p.Company_id.toString() != req.body.Company_id.toString()
-    );
+  if (shareAvilWithUser < req.body.shareCount) {
+    return res.send({ message: "user do not have required shares..." });
+  }
 
-    let walletAmount =
-      company.shareValue * req.body.shareCount + user.walletAmount;
-
+  if (shareAvilWithUser === req.body.shareCount) {
     await User.findByIdAndUpdate(req.body.User_id, {
-      walletAmount: walletAmount,
-      currentHoldings: newHoldings
-    });
-
-    await Company.findByIdAndUpdate(req.body.Company_id, {
-      shareCount: company.shareCount + req.body.shareCount
+      walletAmount: newWalletAmt,
+      $pull: { currentHoldings: { Company_id: req.body.Company_id } }
     });
   } else {
-    let newHoldings = user.currentHoldings.filter(
-      p => p.Company_id.toString() != req.body.Company_id.toString()
-    );
-
-    let newObj = {
+    newCurrentHolding = {
       Company_id: req.body.Company_id,
-      sharePrice: company.shareValue,
-      shareAmount:
-        (currentHoldingsWanted.shareCount - req.body.shareCount) *
-        company.shareValue,
-      shareCount: currentHoldingsWanted.shareCount - req.body.shareCount
+      sharePrice: companyShareValue,
+      shareAmount: calculatedShareAmt,
+      shareCount: existingCompany.shareCount - userShareCount
     };
 
-    newHoldings.push(newObj);
-
-    let walletAmount =
-      company.shareValue * req.body.shareCount + user.walletAmount;
+    await User.findByIdAndUpdate(req.body.User_id, {
+      $pull: { currentHoldings: { Company_id: req.body.Company_id } }
+    });
 
     await User.findByIdAndUpdate(req.body.User_id, {
-      walletAmount: walletAmount,
-      currentHoldings: newHoldings
-    });
-
-    await Company.findByIdAndUpdate(req.body.Company_id, {
-      shareCount: company.shareCount + req.body.shareCount
+      walletAmount: newWalletAmt,
+      $push: { currentHoldings: newCurrentHolding }
     });
   }
-  transaction = new Transaction({
+
+  await Company.findByIdAndUpdate(req.body.Company_id, {
+    shareCount: companyShareCount + userShareCount
+  });
+
+  const currentTime = new Date();
+  const currentOffset = currentTime.getTimezoneOffset();
+  const ISTOffset = 330;
+
+  let transaction = new Transaction({
     userID: req.body.User_id,
     companyID: req.body.Company_id,
     time: new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000),
     type: "sell",
-    numberOfShares: req.body.shareCount,
-    shareAmount: company.shareValue * req.body.shareCount
+    numberOfShares: userShareCount,
+    shareAmount: calculatedShareAmt
   });
+
   await transaction.save();
+
+  let d2 = new Date().getTime();
+
+  console.log(`${d2} - ${d1} = ${d2 - d1}`);
+  console.log("************************");
   await res.io.emit("user", { type: "company" });
   await res.io.emit("global", { type: "company" });
   await res.io.emit("global", { type: "stat" });
   await res.io.emit("user", { type: "stat" });
-  res.send({ message: "Shares Sold Successfully" });
+  res.send({ message: "Shares bought sucessfully..." });
 };
+
+// exports.sellShares = async (req, res) => {
+//   const user = await User.findById(req.body.User_id);
+//   const company = await Company.findById(req.body.Company_id);
+//   const currentHoldingsWanted = user.currentHoldings.find(
+//     p => p.Company_id.toString() == req.body.Company_id.toString()
+//   );
+//   if (!currentHoldingsWanted)
+//     return res.send({ message: "do not have shares to sell" });
+//   if (currentHoldingsWanted.shareCount < req.body.shareCount)
+//     return res.send({ message: "do not have enough shares to sell" });
+//   var currentTime = new Date();
+
+//   var currentOffset = currentTime.getTimezoneOffset();
+
+//   var ISTOffset = 330;
+//   if (currentHoldingsWanted.shareCount == req.body.shareCount) {
+//     let newHoldings = user.currentHoldings.filter(
+//       p => p.Company_id.toString() != req.body.Company_id.toString()
+//     );
+
+//     let walletAmount =
+//       company.shareValue * req.body.shareCount + user.walletAmount;
+
+//     await User.findByIdAndUpdate(req.body.User_id, {
+//       walletAmount: walletAmount,
+//       currentHoldings: newHoldings
+//     });
+
+//     await Company.findByIdAndUpdate(req.body.Company_id, {
+//       shareCount: company.shareCount + req.body.shareCount
+//     });
+//   } else {
+//     let newHoldings = user.currentHoldings.filter(
+//       p => p.Company_id.toString() != req.body.Company_id.toString()
+//     );
+
+//     let newObj = {
+//       Company_id: req.body.Company_id,
+//       sharePrice: company.shareValue,
+//       shareAmount:
+//         (currentHoldingsWanted.shareCount - req.body.shareCount) *
+//         company.shareValue,
+//       shareCount: currentHoldingsWanted.shareCount - req.body.shareCount
+//     };
+
+//     newHoldings.push(newObj);
+
+//     let walletAmount =
+//       company.shareValue * req.body.shareCount + user.walletAmount;
+
+//     await User.findByIdAndUpdate(req.body.User_id, {
+//       walletAmount: walletAmount,
+//       currentHoldings: newHoldings
+//     });
+
+//     await Company.findByIdAndUpdate(req.body.Company_id, {
+//       shareCount: company.shareCount + req.body.shareCount
+//     });
+//   }
+//   transaction = new Transaction({
+//     userID: req.body.User_id,
+//     companyID: req.body.Company_id,
+//     time: new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000),
+//     type: "sell",
+//     numberOfShares: req.body.shareCount,
+//     shareAmount: company.shareValue * req.body.shareCount
+//   });
+//   await transaction.save();
+//   await res.io.emit("user", { type: "company" });
+//   await res.io.emit("global", { type: "company" });
+//   await res.io.emit("global", { type: "stat" });
+//   await res.io.emit("user", { type: "stat" });
+//   res.send({ message: "Shares Sold Successfully" });
+// };
 
 // add to watchlist
 
