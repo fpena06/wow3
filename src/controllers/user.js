@@ -323,13 +323,13 @@ exports.sellShares = async (req, res) => {
     "currentHoldings.Company_id": req.body.Company_id
   }).select("currentHoldings");
 
-  const shareAvilWithUser = existingCompanies.currentHoldings.find(
-    p => p.Company_id.toString() == req.body.Company_id.toString()
-  );
-
   if (!existingCompanies) {
     return res.send({ message: "Do not have shares to sell..." });
   }
+
+  const shareAvilWithUser = existingCompanies.currentHoldings.find(
+    p => p.Company_id.toString() == req.body.Company_id.toString()
+  );
 
   if (shareAvilWithUser < req.body.shareCount) {
     return res.send({ message: "user do not have required shares..." });
