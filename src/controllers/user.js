@@ -553,3 +553,4 @@ exports.stockbar = async (req, res) => {
   }
   res.send({ stockbar });
 };
+console.log("hey there");
