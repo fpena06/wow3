@@ -335,7 +335,7 @@ exports.sellShares = async (req, res) => {
     return res.send({ message: "user do not have required shares..." });
   }
 
-  if (shareAvilWithUser === req.body.shareCount) {
+  if (shareAvilWithUser.shareCount === req.body.shareCount) {
     await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: newWalletAmt,
       $pull: { currentHoldings: { Company_id: req.body.Company_id } }
