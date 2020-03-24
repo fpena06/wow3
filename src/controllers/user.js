@@ -345,7 +345,7 @@ exports.sellShares = async (req, res) => {
       Company_id: req.body.Company_id,
       sharePrice: companyShareValue,
       shareAmount: calculatedShareAmt,
-      shareCount: existingCompany.shareCount - userShareCount
+      shareCount: existingCompanies.shareCount - userShareCount
     };
 
     await User.findByIdAndUpdate(req.body.User_id, {
