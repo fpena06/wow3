@@ -198,7 +198,7 @@ exports.transaction = async (req, res) => {
 
 //buy shares
 
-hello = async (req, res) => {
+exports.buyShares = async (req, res) => {
   console.log("***** Buy Share Logs *****");
   let d1 = new Date().getTime();
   const user = await User.findById(req.body.User_id)
@@ -288,7 +288,11 @@ hello = async (req, res) => {
 
   console.log(`${d2} - ${d1} = ${d2 - d1}`);
   console.log("************************");
-  res.json({ message: "Shares bought sucessfully..." });
+  await res.io.emit("user", { type: "company" });
+  await res.io.emit("global", { type: "company" });
+  await res.io.emit("global", { type: "stat" });
+  await res.io.emit("user", { type: "stat" });
+  res.send({ message: "Shares bought sucessfully..." });
 };
 
 exports.buyShares = async (req, res) => {

@@ -163,7 +163,6 @@ exports.addUser = async (req, res) => {
     return res.send("Error", error.details[0].message);
   }
   let user = await User.findOne({
-    email: req.body.email,
     mobile: req.body.mobile
   });
   if (user)
