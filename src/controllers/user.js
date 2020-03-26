@@ -71,7 +71,6 @@ exports.dashboard = async (req, res) => {
   for (let i = 0; i < user.currentHoldings.length; i++) {
     userShareAmount = userShareAmount + user.currentHoldings[i].shareAmount;
   }
-  console.log("User shareAmount: ", userShareAmount);
   const leaderboardTop = await User.find()
     .sort({ walletAmount: -1 })
     .limit(1)
@@ -199,7 +198,6 @@ exports.transaction = async (req, res) => {
 //buy shares
 
 exports.buyShares = async (req, res) => {
-  console.log("***** Buy Share Logs *****");
   let d1 = new Date().getTime();
   const user = await User.findById(req.body.User_id)
     .select(["walletAmount", "currentHoldings"])
@@ -286,8 +284,6 @@ exports.buyShares = async (req, res) => {
 
   let d2 = new Date().getTime();
 
-  console.log(`${d2} - ${d1} = ${d2 - d1}`);
-  console.log("************************");
   await res.io.emit("user", { type: "company" });
   await res.io.emit("global", { type: "company" });
   await res.io.emit("global", { type: "stat" });
@@ -298,7 +294,6 @@ exports.buyShares = async (req, res) => {
 //sell shares
 
 exports.sellShares = async (req, res) => {
-  console.log("***** Sell Share Logs *****");
   let d1 = new Date().getTime();
   const user = await User.findById(req.body.User_id)
     .select(["walletAmount", "currentHoldings"])
@@ -379,8 +374,6 @@ exports.sellShares = async (req, res) => {
 
   let d2 = new Date().getTime();
 
-  console.log(`${d2} - ${d1} = ${d2 - d1}`);
-  console.log("************************");
   await res.io.emit("user", { type: "company" });
   await res.io.emit("global", { type: "company" });
   await res.io.emit("global", { type: "stat" });
