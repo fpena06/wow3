@@ -294,7 +294,7 @@ exports.buyShares = async (req, res) => {
 //sell shares
 
 exports.sellShares = async (req, res) => {
-  let d1 = new Date().getTime();
+y  let d1 = new Date().getTime();
   const user = await User.findById(req.body.User_id)
     .select(["walletAmount", "currentHoldings"])
     .lean();
