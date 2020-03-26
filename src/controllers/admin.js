@@ -158,7 +158,6 @@ exports.updateCompanyShareValue = async (req, res) => {
 // add user
 
 exports.addUser = async (req, res) => {
-  console.log("hey");
   let { error } = await userValidation(req.body);
   if (error) {
     return res.send("Error", error.details[0].message);
