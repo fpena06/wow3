@@ -18,9 +18,8 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            sudo su
             cd wow3/
             git status
             git pull
             yarn install
-            pm2 restart index
+            sudo pm2 restart index
