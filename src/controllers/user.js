@@ -294,7 +294,7 @@ exports.buyShares = async (req, res) => {
 //sell shares
 
 exports.sellShares = async (req, res) => {
-y  let d1 = new Date().getTime();
+  let d1 = new Date().getTime();
   const user = await User.findById(req.body.User_id)
     .select(["walletAmount", "currentHoldings"])
     .lean();
@@ -380,81 +380,6 @@ y  let d1 = new Date().getTime();
   await res.io.emit("user", { type: "stat" });
   res.send({ message: "Shares Sold Successfully" });
 };
-
-// exports.sellShares = async (req, res) => {
-//   const user = await User.findById(req.body.User_id);
-//   const company = await Company.findById(req.body.Company_id);
-//   const currentHoldingsWanted = user.currentHoldings.find(
-//     p => p.Company_id.toString() == req.body.Company_id.toString()
-//   );
-//   if (!currentHoldingsWanted)
-//     return res.send({ message: "do not have shares to sell" });
-//   if (currentHoldingsWanted.shareCount < req.body.shareCount)
-//     return res.send({ message: "do not have enough shares to sell" });
-//   var currentTime = new Date();
-
-//   var currentOffset = currentTime.getTimezoneOffset();
-
-//   var ISTOffset = 330;
-//   if (currentHoldingsWanted.shareCount == req.body.shareCount) {
-//     let newHoldings = user.currentHoldings.filter(
-//       p => p.Company_id.toString() != req.body.Company_id.toString()
-//     );
-
-//     let walletAmount =
-//       company.shareValue * req.body.shareCount + user.walletAmount;
-
-//     await User.findByIdAndUpdate(req.body.User_id, {
-//       walletAmount: walletAmount,
-//       currentHoldings: newHoldings
-//     });
-
-//     await Company.findByIdAndUpdate(req.body.Company_id, {
-//       shareCount: company.shareCount + req.body.shareCount
-//     });
-//   } else {
-//     let newHoldings = user.currentHoldings.filter(
-//       p => p.Company_id.toString() != req.body.Company_id.toString()
-//     );
-
-//     let newObj = {
-//       Company_id: req.body.Company_id,
-//       sharePrice: company.shareValue,
-//       shareAmount:
-//         (currentHoldingsWanted.shareCount - req.body.shareCount) *
-//         company.shareValue,
-//       shareCount: currentHoldingsWanted.shareCount - req.body.shareCount
-//     };
-
-//     newHoldings.push(newObj);
-
-//     let walletAmount =
-//       company.shareValue * req.body.shareCount + user.walletAmount;
-
-//     await User.findByIdAndUpdate(req.body.User_id, {
-//       walletAmount: walletAmount,
-//       currentHoldings: newHoldings
-//     });
-
-//     await Company.findByIdAndUpdate(req.body.Company_id, {
-//       shareCount: company.shareCount + req.body.shareCount
-//     });
-//   }
-//   transaction = new Transaction({
-//     userID: req.body.User_id,
-//     companyID: req.body.Company_id,
-//     time: new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000),
-//     type: "sell",
-//     numberOfShares: req.body.shareCount,
-//     shareAmount: company.shareValue * req.body.shareCount
-//   });
-//   await transaction.save();
-// await res.io.emit("user", { type: "company" });
-// await res.io.emit("global", { type: "company" });
-// await res.io.emit("global", { type: "stat" });
-// await res.io.emit("user", { type: "stat" });
-// res.send({ message: "Shares Sold Successfully" });
-// };
 
 // add to watchlist
 
