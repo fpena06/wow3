@@ -18,10 +18,8 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            sudo su
-            whoami
-            cd wow3/
-            git status
-            git pull
-            yarn install
+            cd /home/ubuntu/wow3/
+            sudo git status
+            sudo git pull
+            sudo yarn install
             sudo pm2 restart index
