@@ -126,7 +126,9 @@ exports.updateCompanyShareValue = async (req, res) => {
       ],
       shareValue: req.body.shareValue
     });
-    let users = await User.find();
+    let users = await User.find({
+      "watchList.Company_id": req.body.Company_id
+    });
     for (let j = 0; j < users.length; j++) {
       let p = users[j];
       for (let i = 0; i < p.watchList.length; i++) {
@@ -134,16 +136,14 @@ exports.updateCompanyShareValue = async (req, res) => {
           p.watchList[i].Company_id.toString() ===
           req.body.Company_id.toString()
         ) {
-          let name = p.watchList[i].name;
           p.watchList.splice(i, 1, {
             Company_id: req.body.Company_id,
-            name: name,
+            name: p.watchList[i].name,
             shareValue: req.body.shareValue,
             shareValuePercentage: shareValuePercentage
           });
-          let updatedWatchlist = p.watchList;
           await User.findByIdAndUpdate(p._id, {
-            watchList: updatedWatchlist
+            watchList: p.watchList
           });
         }
       }

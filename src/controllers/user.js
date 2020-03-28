@@ -104,7 +104,7 @@ exports.dashboardCategory = async (req, res) => {
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
 
   const user = await User.findOne({ mobile: decoded.mobile });
-  const userCurrentHoldings = await user.currentHoldings;
+  const userCurrentHoldings = user.currentHoldings;
 
   let xyz = await companyCategory.map(company => {
     let foundCompany = userCurrentHoldings.find(
