@@ -183,7 +183,7 @@ exports.transaction = async (req, res) => {
     company = await Company.findById(c.Company_id.toString());
 
     userCurrentHoldings.push({
-      company_id: c._id,
+      company_id: c.Company_id,
       companyName: company.name,
       shareCount: c.shareCount,
     });
