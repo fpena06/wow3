@@ -103,9 +103,7 @@ exports.addCompany = async (req, res) => {
 
 exports.updateCompanyShareValue = async (req, res) => {
   var currentTime = new Date();
-
   var currentOffset = currentTime.getTimezoneOffset();
-
   var ISTOffset = 330;
   let company = await Company.findById(req.body.Company_id);
   if (!req.body.shareValue) return res.send("share value is needed");
@@ -129,9 +127,11 @@ exports.updateCompanyShareValue = async (req, res) => {
     let users = await User.find({
       "watchList.Company_id": req.body.Company_id
     });
-    for (let j = 0; j < users.length; j++) {
+    let n = users.length;
+    for (let j = 0; j < n; j++) {
       let p = users[j];
-      for (let i = 0; i < p.watchList.length; i++) {
+      let m = p.watchList.length;
+      for (let i = 0; i < m; i++) {
         if (
           p.watchList[i].Company_id.toString() ===
           req.body.Company_id.toString()

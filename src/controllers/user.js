@@ -13,7 +13,7 @@ exports.time = async (req, res) => {
 
 exports.login = async (req, res) => {
   const user = await User.findOne({
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   });
   if (!user) {
     return res.send("Invalid credentials...");
@@ -26,7 +26,7 @@ exports.login = async (req, res) => {
       res.send({
         message: "Sucessfully logged in ...",
         user: { mobile: user.mobile, name: user.name, _id: user._id },
-        token
+        token,
       });
     } else return res.send({ message: "incorrect password" });
   }
@@ -36,11 +36,11 @@ exports.login = async (req, res) => {
 
 exports.changePassword = async (req, res) => {
   const user = await User.findOne({
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   });
   if (user.password != req.body.oldPassword) {
     return res.send({
-      message: "old password is incorrect. please enter valid password"
+      message: "old password is incorrect. please enter valid password",
     });
   }
   user.password = req.body.newPassword;
@@ -50,9 +50,9 @@ exports.changePassword = async (req, res) => {
 
 //user dashboard stats
 
-exports.dashboardSocket = async data => {
+exports.dashboardSocket = async (data) => {
   const user = await User.findOne({
-    mobile: data.mobile
+    mobile: data.mobile,
   });
   return user;
 };
@@ -60,7 +60,7 @@ exports.dashboardSocket = async data => {
 //user dashboard
 exports.dashboard = async (req, res) => {
   const user = await User.findOne({
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   });
   const userWalletAmount = user.walletAmount;
   const grossingCompany = await Company.find()
@@ -79,7 +79,7 @@ exports.dashboard = async (req, res) => {
     userShareAmount,
     userWalletAmount,
     grossingCompany,
-    leaderboardTop
+    leaderboardTop,
   });
 };
 
@@ -88,7 +88,7 @@ exports.dashboard = async (req, res) => {
 exports.category = async (req, res) => {
   let companies = await Company.find();
 
-  let uniqueCategory = [...new Set(companies.map(c => c.category))];
+  let uniqueCategory = [...new Set(companies.map((c) => c.category))];
   res.send(uniqueCategory);
 };
 
@@ -100,15 +100,15 @@ exports.dashboardCategory = async (req, res) => {
     config.get("TOKEN")
   );
   const companyCategory = await Company.find({
-    category: req.body.category
+    category: req.body.category,
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
 
   const user = await User.findOne({ mobile: decoded.mobile });
   const userCurrentHoldings = user.currentHoldings;
 
-  let xyz = await companyCategory.map(company => {
+  let xyz = await companyCategory.map((company) => {
     let foundCompany = userCurrentHoldings.find(
-      p => p.Company_id.toString() == company._id.toString()
+      (p) => p.Company_id.toString() == company._id.toString()
     );
     let obj = {
       _id: company._id,
@@ -116,7 +116,7 @@ exports.dashboardCategory = async (req, res) => {
       shareValue: company.shareValue,
       shareCount: company.shareCount,
       previousValue: company.previousValue,
-      boughtVolume: foundCompany ? foundCompany.shareCount : 0
+      boughtVolume: foundCompany ? foundCompany.shareCount : 0,
     };
 
     return obj;
@@ -127,9 +127,7 @@ exports.dashboardCategory = async (req, res) => {
 // news display
 
 exports.newsDisplay = async (req, res) => {
-  const news = await News.find()
-    .limit(10)
-    .sort({ time: -1 });
+  const news = await News.find().limit(10).sort({ time: -1 });
   res.send(news);
 };
 
@@ -144,7 +142,7 @@ exports.leaderboard = async (req, res) => {
     .sort({ walletAmount: -1 })
     .select(["name", "walletAmount", "mobile"]);
 
-  let rank = leaderboardUsers.findIndex(p => p.mobile === user.mobile) + 1;
+  let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
   return res.send({ leaderboardUsers, rank });
 };
 
@@ -152,7 +150,7 @@ exports.leaderboard = async (req, res) => {
 
 exports.transaction = async (req, res) => {
   const userTransactions = await Transaction.find({
-    userID: req.body.User_id
+    userID: req.body.User_id,
   }).sort({ time: -1 });
 
   let userTransaction = [];
@@ -174,7 +172,7 @@ exports.transaction = async (req, res) => {
       sharePrice: sharePrice,
       shareQuantity: t.numberOfShares,
       totalAmount: t.shareAmount,
-      type: t.type
+      type: t.type,
     });
   }
 
@@ -185,13 +183,14 @@ exports.transaction = async (req, res) => {
     company = await Company.findById(c.Company_id.toString());
 
     userCurrentHoldings.push({
+      company_id: c._id,
       companyName: company.name,
-      shareCount: c.shareCount
+      shareCount: c.shareCount,
     });
   }
   return res.send({
     userTransaction: userTransaction,
-    userCurrentHoldings: userCurrentHoldings
+    userCurrentHoldings: userCurrentHoldings,
   });
 };
 
@@ -227,7 +226,7 @@ exports.buyShares = async (req, res) => {
 
   const existingCompanies = await User.findOne({
     _id: req.body.User_id,
-    "currentHoldings.Company_id": req.body.Company_id
+    "currentHoldings.Company_id": req.body.Company_id,
   }).select("currentHoldings");
 
   if (!existingCompanies) {
@@ -235,36 +234,36 @@ exports.buyShares = async (req, res) => {
       Company_id: req.body.Company_id,
       sharePrice: companyShareValue,
       shareAmount: calculatedShareAmt,
-      shareCount: userShareCount
+      shareCount: userShareCount,
     };
     await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: newWalletAmt,
-      $push: { currentHoldings: newCurrentHolding }
+      $push: { currentHoldings: newCurrentHolding },
     });
   } else {
     const existingCompany = existingCompanies.currentHoldings.find(
-      c => c.Company_id.toString() === req.body.Company_id
+      (c) => c.Company_id.toString() === req.body.Company_id
     );
 
     newCurrentHolding = {
       Company_id: req.body.Company_id,
       sharePrice: companyShareValue,
       shareAmount: existingCompany.shareAmount + calculatedShareAmt,
-      shareCount: existingCompany.shareCount + userShareCount
+      shareCount: existingCompany.shareCount + userShareCount,
     };
 
     await User.findByIdAndUpdate(req.body.User_id, {
-      $pull: { currentHoldings: { Company_id: req.body.Company_id } }
+      $pull: { currentHoldings: { Company_id: req.body.Company_id } },
     });
 
     await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: newWalletAmt,
-      $push: { currentHoldings: newCurrentHolding }
+      $push: { currentHoldings: newCurrentHolding },
     });
   }
 
   await Company.findByIdAndUpdate(req.body.Company_id, {
-    shareCount: companyShareCount - userShareCount
+    shareCount: companyShareCount - userShareCount,
   });
 
   const currentTime = new Date();
@@ -277,7 +276,7 @@ exports.buyShares = async (req, res) => {
     time: new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000),
     type: "buy",
     numberOfShares: userShareCount,
-    shareAmount: calculatedShareAmt
+    shareAmount: calculatedShareAmt,
   });
 
   await transaction.save();
@@ -315,7 +314,7 @@ exports.sellShares = async (req, res) => {
 
   const existingCompanies = await User.findOne({
     _id: req.body.User_id,
-    "currentHoldings.Company_id": req.body.Company_id
+    "currentHoldings.Company_id": req.body.Company_id,
   }).select("currentHoldings");
 
   if (!existingCompanies) {
@@ -323,7 +322,7 @@ exports.sellShares = async (req, res) => {
   }
 
   const shareAvilWithUser = existingCompanies.currentHoldings.find(
-    p => p.Company_id.toString() == req.body.Company_id.toString()
+    (p) => p.Company_id.toString() == req.body.Company_id.toString()
   );
 
   if (shareAvilWithUser.shareCount < req.body.shareCount) {
@@ -333,28 +332,28 @@ exports.sellShares = async (req, res) => {
   if (shareAvilWithUser.shareCount === req.body.shareCount) {
     await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: newWalletAmt,
-      $pull: { currentHoldings: { Company_id: req.body.Company_id } }
+      $pull: { currentHoldings: { Company_id: req.body.Company_id } },
     });
   } else {
     newCurrentHolding = {
       Company_id: req.body.Company_id,
       sharePrice: companyShareValue,
       shareAmount: shareAvilWithUser.shareAmount - calculatedShareAmt,
-      shareCount: shareAvilWithUser.shareCount - userShareCount
+      shareCount: shareAvilWithUser.shareCount - userShareCount,
     };
 
     await User.findByIdAndUpdate(req.body.User_id, {
-      $pull: { currentHoldings: { Company_id: req.body.Company_id } }
+      $pull: { currentHoldings: { Company_id: req.body.Company_id } },
     });
 
     await User.findByIdAndUpdate(req.body.User_id, {
       walletAmount: newWalletAmt,
-      $push: { currentHoldings: newCurrentHolding }
+      $push: { currentHoldings: newCurrentHolding },
     });
   }
 
   await Company.findByIdAndUpdate(req.body.Company_id, {
-    shareCount: companyShareCount + userShareCount
+    shareCount: companyShareCount + userShareCount,
   });
 
   const currentTime = new Date();
@@ -367,7 +366,7 @@ exports.sellShares = async (req, res) => {
     time: new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000),
     type: "sell",
     numberOfShares: userShareCount,
-    shareAmount: calculatedShareAmt
+    shareAmount: calculatedShareAmt,
   });
 
   await transaction.save();
@@ -385,16 +384,16 @@ exports.sellShares = async (req, res) => {
 
 exports.addToWatchlist = async (req, res) => {
   const user = await User.findOne({
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   });
   const company = await Company.findById(req.body.Company_id).select([
     "_id",
     "name",
     "shareValue",
-    "previousValue"
+    "previousValue",
   ]);
   let flag = 0;
-  user.watchList.forEach(p => {
+  user.watchList.forEach((p) => {
     if (p.name === company.name) return (flag = 1);
   });
   if (flag === 0) {
@@ -411,9 +410,9 @@ exports.addToWatchlist = async (req, res) => {
           Company_id: company._id,
           name: company.name,
           shareValue: company.shareValue,
-          shareValuePercentage
-        }
-      ]
+          shareValuePercentage,
+        },
+      ],
     });
   } else return res.send({ message: "company already exist in watchlist" });
   await res.io.emit("user", { type: "watchlist" });
@@ -424,20 +423,20 @@ exports.addToWatchlist = async (req, res) => {
 
 exports.removeFromWatchlist = async (req, res) => {
   const user = await User.findOne({
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   });
   const company = await Company.findById(req.body.Company_id);
   let checkWatchlist = user.watchList.find(
-    p => p.name.toString() === company.name.toString()
+    (p) => p.name.toString() === company.name.toString()
   );
   if (!user) return res.send({ message: "user not present in database..." });
   if (!checkWatchlist)
     return res.send({ message: "company not present in watchlist" });
   let newWatchlist = user.watchList.filter(
-    p => p.name.toString() != company.name.toString()
+    (p) => p.name.toString() != company.name.toString()
   );
   await User.findByIdAndUpdate(user._id, {
-    watchList: newWatchlist
+    watchList: newWatchlist,
   });
   await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "removed from watchlist sucessfully" });
@@ -465,7 +464,7 @@ exports.stockbar = async (req, res) => {
     let status = changeValue >= 0 ? "up" : "down";
     let obj = {
       companyName: company.name,
-      stat: status
+      stat: status,
     };
     stockbar.push(obj);
   }
