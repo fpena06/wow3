@@ -432,7 +432,7 @@ exports.watchlist = async (req, res) => {
     User_id: user._id,
   });
   let userWatchlist1 = [];
-  for (let i = 0; i < userWatchlist.length(); i++) {
+  for (let i = 0; i < userWatchlist.length; i++) {
     let c = await Company.findById(userWatchlist[i].Company_id);
     const shareValueChange =
       c.shareValue - c.previousValue[c.previousValue.length - 1].value;
