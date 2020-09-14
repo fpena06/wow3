@@ -5,7 +5,7 @@ let {
   companyValidation,
   userValidation,
   News,
-  Transaction
+  Transaction,
 } = require("../models");
 const jwt = require("jsonwebtoken");
 const config = require("config");
@@ -17,11 +17,11 @@ exports.addAdmin = async (req, res) => {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   });
   await admin.save();
   res.json({
-    message: "admin added sucessfully"
+    message: "admin added sucessfully",
   });
 };
 
@@ -40,7 +40,7 @@ exports.login = async (req, res) => {
       res.send({
         message: "Suceefully logged in ...",
         user: admin,
-        token: token
+        token: token,
       }); // Token to be included after generation
     }
   }
@@ -51,7 +51,7 @@ exports.login = async (req, res) => {
 exports.dashboard = async (req, res) => {
   let companies = await Company.find();
 
-  let uniqueCategory = [...new Set(companies.map(c => c.category))];
+  let uniqueCategory = [...new Set(companies.map((c) => c.category))];
   res.send(uniqueCategory);
 };
 
@@ -59,7 +59,7 @@ exports.dashboard = async (req, res) => {
 
 exports.dashboardCategory = async (req, res) => {
   const companyCategory = await Company.find({
-    category: req.body.category
+    category: req.body.category,
   }).select(["name", "shareValue", "shareCount", "previousValue"]);
   return res.send({ companies: companyCategory });
 };
@@ -88,13 +88,13 @@ exports.addCompany = async (req, res) => {
           value: req.body.shareValue,
           time: new Date(
             currentTime.getTime() + (ISTOffset + currentOffset) * 60000
-          )
-        }
-      ]
+          ),
+        },
+      ],
     });
     await company.save();
     res.json({
-      message: "Company added sucessfully"
+      message: "Company added sucessfully",
     });
   } else return res.send({ message: "company already exist" });
 };
@@ -119,13 +119,13 @@ exports.updateCompanyShareValue = async (req, res) => {
           value: company.shareValue,
           time: new Date(
             currentTime.getTime() + (ISTOffset + currentOffset) * 60000
-          )
-        }
+          ),
+        },
       ],
-      shareValue: req.body.shareValue
+      shareValue: req.body.shareValue,
     });
     let users = await User.find({
-      "watchList.Company_id": req.body.Company_id
+      "watchList.Company_id": req.body.Company_id,
     });
     let n = users.length;
     for (let j = 0; j < n; j++) {
@@ -140,15 +140,15 @@ exports.updateCompanyShareValue = async (req, res) => {
             Company_id: req.body.Company_id,
             name: p.watchList[i].name,
             shareValue: req.body.shareValue,
-            shareValuePercentage: shareValuePercentage
+            shareValuePercentage: shareValuePercentage,
           });
           await User.findByIdAndUpdate(p._id, {
-            watchList: p.watchList
+            watchList: p.watchList,
           });
         }
       }
     }
-    await res.io.emit("global", { type: "stat" });
+    res.io.emit("global", { type: "stat" });
 
     res.io.emit("global", { name: company.name, type: "stockbar" });
     res.io.emit("global", { type: "company" });
@@ -163,11 +163,11 @@ exports.addUser = async (req, res) => {
     return res.send("Error", error.details[0].message);
   }
   let user = await User.findOne({
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   });
   if (user)
     return res.json({
-      message: "User Already Exist..."
+      message: "User Already Exist...",
     });
   user = new User({
     name: req.body.name,
@@ -175,13 +175,13 @@ exports.addUser = async (req, res) => {
     password: req.body.password,
     mobile: req.body.mobile,
     watchList: [],
-    currentHoldings: []
+    currentHoldings: [],
   });
-  await user.save(err => {
+  await user.save((err) => {
     if (err) return res.send({ message: "User not created" });
     else
       res.json({
-        message: "User added sucessfully"
+        message: "User added sucessfully",
       });
   });
 };
@@ -190,7 +190,7 @@ exports.addUser = async (req, res) => {
 
 exports.userDetails = async (req, res) => {
   const user = await User.findOne({
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   }).select(["name", "email", "password", "mobile"]);
   if (!user) return res.send({ message: "user does not exist" });
   res.send({ user: user });
@@ -201,7 +201,7 @@ exports.userDetails = async (req, res) => {
 exports.addNews = async (req, res) => {
   news = new News({
     description: req.body.description,
-    time: new Date()
+    time: new Date(),
   });
   await news.save();
   res.io.emit("global", { type: "news" });
@@ -230,7 +230,7 @@ exports.leaderboard = async (req, res) => {
 exports.transaction = async (req, res) => {
   let user = await User.findOne({ mobile: req.body.mobile });
   const userTransactions = await Transaction.find({
-    userID: user._id.toString()
+    userID: user._id.toString(),
   }).sort({ time: -1 });
   let userTransaction = [];
   let company;
@@ -249,12 +249,12 @@ exports.transaction = async (req, res) => {
       sharePrice: sharePrice,
       shareQuantity: t.numberOfShares,
       totalAmount: t.shareAmount,
-      type: t.type
+      type: t.type,
     });
   }
   return res.send({
     message: "transaction of user",
-    userTransaction: userTransaction
+    userTransaction: userTransaction,
   });
 };
 

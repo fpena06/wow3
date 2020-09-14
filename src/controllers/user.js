@@ -1,7 +1,6 @@
-let { User, Company, Transaction, News } = require("../models");
+let { User, Company, Transaction, News, Watchlist } = require("../models");
 const config = require("config");
 const jwt = require("jsonwebtoken");
-const { Watchlist } = require("../models/watchlist");
 const user = require("../models/user");
 
 //get end time
@@ -391,11 +390,10 @@ exports.addToWatchlist = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile,
   });
-  const company = await Company.findById(req.body.Company_id).select(["_id"]);
-  let flag = 0;
-  let checkWatchlist = watchlist.findOne(
-    (p) => p.Company_id === req.body.Company_id && p.User_id === user._id
-  );
+  let checkWatchlist = await Watchlist.findOne({
+    Company_id: req.body.Company_id,
+    User_id: user._id.toString(),
+  });
   if (!checkWatchlist) {
     watchlist = new Watchlist({
       Company_id: req.body.Company_id,
@@ -403,7 +401,7 @@ exports.addToWatchlist = async (req, res) => {
     });
     await watchlist.save();
   } else return res.send({ message: "company already exist in watchlist" });
-  await res.io.emit("user", { type: "watchlist" });
+  res.io.emit("user", { type: "watchlist" });
   res.send({ message: "added to watchlist sucessfully" });
 };
 
@@ -413,16 +411,15 @@ exports.removeFromWatchlist = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile,
   });
-  const company = await Company.findById(req.body.Company_id);
-
-  let checkWatchlist = watchlist.findOne(
-    (p) => p.Company_id === req.body.Company_id && p.User_id === user._id
-  );
+  let checkWatchlist = await Watchlist.findOne({
+    Company_id: req.body.Company_id,
+    User_id: user._id.toString(),
+  });
   if (!user) return res.send({ message: "user not present in database..." });
   if (!checkWatchlist)
     return res.send({ message: "company not present in watchlist" });
   await Watchlist.findByIdAndDelete(checkWatchlist._id);
-  await res.io.emit("user", { type: "watchlist" });
+  res.io.emit("user", { type: "watchlist" });
   res.send({ message: "removed from watchlist sucessfully" });
 };
 
@@ -431,8 +428,8 @@ exports.removeFromWatchlist = async (req, res) => {
 exports.watchlist = async (req, res) => {
   const user = await User.findOne({ mobile: req.body.mobile });
   if (!user) return res.send({ message: "user not valid" });
-  const userWatchlist = await Watchlist.find((p) => {
-    p.User_id === user._id;
+  const userWatchlist = await Watchlist.find({
+    User_id: user._id,
   });
   let userWatchlist1 = [];
   for (let i = 0; i < userWatchlist.length(); i++) {
