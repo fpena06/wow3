@@ -1,6 +1,8 @@
 let { User, Company, Transaction, News } = require("../models");
 const config = require("config");
 const jwt = require("jsonwebtoken");
+const { Watchlist } = require("../models/watchlist");
+const user = require("../models/user");
 
 //get end time
 
@@ -142,6 +144,8 @@ exports.leaderboard = async (req, res) => {
     .sort({ walletAmount: -1 })
     .select(["name", "walletAmount", "mobile"])
     .limit(10);
+
+  const transaction = await Transaction.find().select("name");
 
   let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
   return res.send({ leaderboardUsers, rank });
@@ -387,34 +391,17 @@ exports.addToWatchlist = async (req, res) => {
   const user = await User.findOne({
     mobile: req.body.mobile,
   });
-  const company = await Company.findById(req.body.Company_id).select([
-    "_id",
-    "name",
-    "shareValue",
-    "previousValue",
-  ]);
+  const company = await Company.findById(req.body.Company_id).select(["_id"]);
   let flag = 0;
-  user.watchList.forEach((p) => {
-    if (p.name === company.name) return (flag = 1);
-  });
-  if (flag === 0) {
-    const shareValueChange =
-      company.shareValue -
-      company.previousValue[company.previousValue.length - 1].value;
-    const shareValuePercentage = Number(
-      ((shareValueChange / company.shareValue) * 100).toFixed()
-    );
-    await User.findByIdAndUpdate(user._id, {
-      watchList: [
-        ...user.watchList,
-        {
-          Company_id: company._id,
-          name: company.name,
-          shareValue: company.shareValue,
-          shareValuePercentage,
-        },
-      ],
+  let checkWatchlist = watchlist.findOne(
+    (p) => p.Company_id === req.body.Company_id && p.User_id === user._id
+  );
+  if (!checkWatchlist) {
+    watchlist = new Watchlist({
+      Company_id: req.body.Company_id,
+      User_id: user._id,
     });
+    await watchlist.save();
   } else return res.send({ message: "company already exist in watchlist" });
   await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "added to watchlist sucessfully" });
@@ -427,18 +414,14 @@ exports.removeFromWatchlist = async (req, res) => {
     mobile: req.body.mobile,
   });
   const company = await Company.findById(req.body.Company_id);
-  let checkWatchlist = user.watchList.find(
-    (p) => p.name.toString() === company.name.toString()
+
+  let checkWatchlist = watchlist.findOne(
+    (p) => p.Company_id === req.body.Company_id && p.User_id === user._id
   );
   if (!user) return res.send({ message: "user not present in database..." });
   if (!checkWatchlist)
     return res.send({ message: "company not present in watchlist" });
-  let newWatchlist = user.watchList.filter(
-    (p) => p.name.toString() != company.name.toString()
-  );
-  await User.findByIdAndUpdate(user._id, {
-    watchList: newWatchlist,
-  });
+  await Watchlist.findByIdAndDelete(checkWatchlist._id);
   await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "removed from watchlist sucessfully" });
 };
@@ -448,8 +431,26 @@ exports.removeFromWatchlist = async (req, res) => {
 exports.watchlist = async (req, res) => {
   const user = await User.findOne({ mobile: req.body.mobile });
   if (!user) return res.send({ message: "user not valid" });
-  const userWatchlist = await user.watchList;
-  res.send(userWatchlist);
+  const userWatchlist = await Watchlist.find((p) => {
+    p.User_id === user._id;
+  });
+  let userWatchlist1 = [];
+  for (let i = 0; i < userWatchlist.length(); i++) {
+    let c = await Company.findById(userWatchlist[i].Company_id);
+    const shareValueChange =
+      c.shareValue - c.previousValue[c.previousValue.length - 1].value;
+    const shareValuePercentage = Number(
+      ((shareValueChange / c.shareValue) * 100).toFixed()
+    );
+    let obj = {
+      name: c.name,
+      Company_id: c._id,
+      shareValue: c.shareValue,
+      shareValuePercentage,
+    };
+    userWatchlist1.push(obj);
+  }
+  res.send(userWatchlist1);
 };
 
 // stockbar

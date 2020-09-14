@@ -5,6 +5,7 @@ const { Transaction } = require("./transaction");
 const { News } = require("./news");
 const { Broker } = require("./broker");
 const mongoose = require("mongoose");
+const { Watchlist } = require("./watchlist");
 
 module.exports = {
   News: mongoose.model("News", News),
@@ -14,5 +15,6 @@ module.exports = {
   Admin: mongoose.model("Admin", Admin),
   Broker: mongoose.model("Broker", Broker),
   Company: mongoose.model("Company", Company),
-  Transaction: mongoose.model("Transaction", Transaction)
+  Watchlist: mongoose.model("Watchlist", Watchlist),
+  Transaction: mongoose.model("Transaction", Transaction),
 };
