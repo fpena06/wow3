@@ -124,7 +124,7 @@ exports.updateCompanyShareValue = async (req, res) => {
       ],
       shareValue: req.body.shareValue,
     });
-    let users = await User.find({
+    /*let users = await User.find({
       "watchList.Company_id": req.body.Company_id,
     });
     let n = users.length;
@@ -147,7 +147,7 @@ exports.updateCompanyShareValue = async (req, res) => {
           });
         }
       }
-    }
+    }*/
     res.io.emit("global", { type: "stat" });
 
     res.io.emit("global", { name: company.name, type: "stockbar" });
