@@ -174,7 +174,6 @@ exports.addUser = async (req, res) => {
     email: req.body.email,
     password: req.body.password,
     mobile: req.body.mobile,
-    watchList: [],
     currentHoldings: [],
   });
   await user.save((err) => {
