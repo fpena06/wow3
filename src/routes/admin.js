@@ -4,11 +4,11 @@ const Auth = require("../middleware/index");
 
 //add admin
 
-router.post("/addAdmin", Admin.addAdmin);
+router.post("/addAdmin", Auth.auth.checkToken, Admin.addAdmin);
 
 // add user
 
-router.post("/addUser", Admin.addUser);
+router.post("/addUser", Auth.auth.checkToken, Admin.addUser);
 
 //admin login
 
