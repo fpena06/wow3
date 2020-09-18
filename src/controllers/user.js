@@ -285,7 +285,10 @@ exports.buyShares = async (req, res) => {
   transaction.save();
 
   res.io.emit("user", { type: "company" });
-  res.io.emit("global", { type: "company", Compay_id: company._id.toString() });
+  res.io.emit("global", {
+    type: "company",
+    Company_id: company._id.toString(),
+  });
   res.io.emit("global", { type: "stat" });
   res.io.emit("user", { type: "stat" });
   res.send({ message: "Shares bought sucessfully..." });
@@ -372,7 +375,10 @@ exports.sellShares = async (req, res) => {
   transaction.save();
 
   res.io.emit("user", { type: "company" });
-  res.io.emit("global", { type: "company", Compay_id: company._id.toString() });
+  res.io.emit("global", {
+    type: "company",
+    Company_id: company._id.toString(),
+  });
   res.io.emit("global", { type: "stat" });
   res.io.emit("user", { type: "stat" });
   res.send({ message: "Shares Sold Successfully" });
