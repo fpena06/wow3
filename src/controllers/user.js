@@ -393,7 +393,7 @@ exports.addToWatchlist = async (req, res) => {
       Company_id: req.body.Company_id,
       User_id: user._id,
     });
-    watchlist.save();
+    await watchlist.save();
   } else return res.send({ message: "company already exist in watchlist" });
   await res.io.emit("user", { type: "watchlist", message: user.mobile });
   res.send({ message: "added to watchlist sucessfully" });
