@@ -393,9 +393,9 @@ exports.addToWatchlist = async (req, res) => {
       Company_id: req.body.Company_id,
       User_id: user._id,
     });
-    await watchlist.save();
+    watchlist.save();
   } else return res.send({ message: "company already exist in watchlist" });
-  res.io.emit("user", { type: "watchlist" });
+  await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "added to watchlist sucessfully" });
 };
 
@@ -413,7 +413,7 @@ exports.removeFromWatchlist = async (req, res) => {
   if (!checkWatchlist)
     return res.send({ message: "company not present in watchlist" });
   await Watchlist.findByIdAndDelete(checkWatchlist._id);
-  res.io.emit("user", { type: "watchlist" });
+  await res.io.emit("user", { type: "watchlist" });
   res.send({ message: "removed from watchlist sucessfully" });
 };
 
