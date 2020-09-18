@@ -35,7 +35,7 @@ exports.login = async (req, res) => {
     if (req.body.password == admin.password) {
       let token = await jwt.sign(
         { mobile: req.body.mobile, password: req.body.password },
-        config.get("TOKEN")
+        config.get("TOKEN2")
       );
       res.send({
         message: "Suceefully logged in ...",
