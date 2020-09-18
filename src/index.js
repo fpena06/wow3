@@ -1,4 +1,5 @@
 const express = require("express");
+const morgan = require("morgan");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const routes = require("./routes");
@@ -13,9 +14,9 @@ const cors = require("cors");
 const server = http.createServer(app);
 const io = socketIo(server, { transport: ["websocket"] });
 io.origins("*:*");
-io.on("connection", socket => {
+io.on("connection", (socket) => {
   console.log(socket.handshake.address + " Connected");
-  socket.on("user", async data => {
+  socket.on("user", async (data) => {
     console.log("shreeji sent", data);
     const user = await require("../src/controllers/user").dashboardSocket(data);
     console.log(user);
@@ -29,10 +30,13 @@ io.on("connection", socket => {
 const corsOption = {
   origin: true,
   credentials: true,
-  exposedHeaders: "x-access-token"
+  exposedHeaders: "x-access-token",
 };
 app.use(cors(corsOption));
 
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms")
+);
 app.use((req, res, next) => {
   res.io = io;
   next();
@@ -48,9 +52,9 @@ mongoose.connect(
     useFindAndModify: false,
     useCreateIndex: true,
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   },
-  err => {
+  (err) => {
     if (err) {
       console.log("Error Connecting Database");
       console.log(err);
