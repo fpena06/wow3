@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const helmet = require("helmet");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const routes = require("./routes");
@@ -32,6 +33,8 @@ const corsOption = {
   credentials: true,
   exposedHeaders: "x-access-token",
 };
+
+app.use(helmet());
 app.use(cors(corsOption));
 
 app.use(
