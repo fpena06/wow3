@@ -201,7 +201,6 @@ exports.transaction = async (req, res) => {
 //buy shares
 
 exports.buyShares = async (req, res) => {
-  let d1 = new Date().getTime();
   const user = await User.findById(req.body.User_id)
     .select(["walletAmount", "currentHoldings"])
     .lean();
@@ -283,21 +282,18 @@ exports.buyShares = async (req, res) => {
     shareAmount: calculatedShareAmt,
   });
 
-  await transaction.save();
+  transaction.save();
 
-  let d2 = new Date().getTime();
-
-  await res.io.emit("user", { type: "company" });
-  await res.io.emit("global", { type: "company" });
-  await res.io.emit("global", { type: "stat" });
-  await res.io.emit("user", { type: "stat" });
+  res.io.emit("user", { type: "company" });
+  res.io.emit("global", { type: "company" });
+  res.io.emit("global", { type: "stat" });
+  res.io.emit("user", { type: "stat" });
   res.send({ message: "Shares bought sucessfully..." });
 };
 
 //sell shares
 
 exports.sellShares = async (req, res) => {
-  let d1 = new Date().getTime();
   const user = await User.findById(req.body.User_id)
     .select(["walletAmount", "currentHoldings"])
     .lean();
@@ -373,14 +369,12 @@ exports.sellShares = async (req, res) => {
     shareAmount: calculatedShareAmt,
   });
 
-  await transaction.save();
+  transaction.save();
 
-  let d2 = new Date().getTime();
-
-  await res.io.emit("user", { type: "company" });
-  await res.io.emit("global", { type: "company" });
-  await res.io.emit("global", { type: "stat" });
-  await res.io.emit("user", { type: "stat" });
+  res.io.emit("user", { type: "company" });
+  res.io.emit("global", { type: "company" });
+  res.io.emit("global", { type: "stat" });
+  res.io.emit("user", { type: "stat" });
   res.send({ message: "Shares Sold Successfully" });
 };
 
