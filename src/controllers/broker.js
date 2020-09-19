@@ -9,11 +9,11 @@ exports.addBroker = async (req, res) => {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    mobile: req.body.mobile
+    mobile: req.body.mobile,
   });
   await broker.save();
   res.json({
-    message: "broker added sucessfully"
+    message: "broker added sucessfully",
   });
 };
 
@@ -33,7 +33,7 @@ exports.login = async (req, res) => {
       res.send({
         message: "Suceefully logged in ...",
         user: broker,
-        token: token
+        token: token,
       }); // Token to be included after generation
     }
   }
@@ -42,12 +42,17 @@ exports.login = async (req, res) => {
 // advise taken
 
 exports.brokerTip = async (req, res) => {
-  let user = await User.findOne({ mobile: req.body.mobile });
-  if (user.walletAmount < req.body.tipAmount)
-    return res.send({ message: "Do not have enough money" });
-  let walletAmount = user.walletAmount - req.body.tipAmount;
-  await User.findByIdAndUpdate(user._id, {
-    walletAmount: walletAmount
-  });
-  res.send({ message: "money deducted successfully " });
+  try {
+    let user = await User.findOne({ mobile: req.body.mobile });
+    if (user.walletAmount < req.body.tipAmount)
+      return res.send({ message: "Do not have enough money" });
+    let walletAmount = user.walletAmount - req.body.tipAmount;
+    await User.findByIdAndUpdate(user._id, {
+      walletAmount: walletAmount,
+    });
+    res.send({ message: "money deducted successfully " });
+  } catch (ex) {
+    console.log(ex);
+    res.send({ message: "Internal Server Error" });
+  }
 };
