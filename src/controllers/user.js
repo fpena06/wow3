@@ -187,7 +187,7 @@ exports.leaderboard = async (req, res) => {
       }
     });
 
-    return res.send({ top10, rank });
+    return res.send({ leaderboardUsers: top10, rank });
   } catch (ex) {
     console.log(ex);
     res.send({ message: "Internal Server Error" });
