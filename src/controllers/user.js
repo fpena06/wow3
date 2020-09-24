@@ -176,8 +176,7 @@ exports.leaderboard = async (req, res) => {
 
     leaderboardUsers = leaderboardUsers.filter(async (e) => {
       let transaction = await Transaction.findOne({ userID: e._id });
-      console.log(transaction);
-      if (transaction) return e;
+      if (transaction !== null) return e;
     });
 
     let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
