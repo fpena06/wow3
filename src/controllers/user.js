@@ -172,19 +172,22 @@ exports.leaderboard = async (req, res) => {
     );
     let leaderboardUsers = await User.find()
       .sort({ walletAmount: -1 })
-      .select(["name", "walletAmount", "mobile"]);
+      .select(["_id", "name", "walletAmount", "mobile"]);
+
+    leaderboardUsers = leaderboardUsers.filter(async (e) => {
+      let transaction = await Transaction.findOne({ userID: e._id });
+      if (transaction) return e;
+    });
 
     let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
 
-    leaderboardUsers = leaderboardUsers.filter((a, i) => {
+    let top10 = leaderboardUsers.filter((a, i) => {
       if (i <= 9) {
         return a;
       }
     });
 
-    // const transaction = await Transaction.find().select("name");
-
-    return res.send({ leaderboardUsers, rank });
+    return res.send({ top10, rank });
   } catch (ex) {
     console.log(ex);
     res.send({ message: "Internal Server Error" });
