@@ -208,19 +208,36 @@ exports.leaderboard = async (req, res) => {
     );
     let leaderboardUsers = await User.find()
       .sort({ walletAmount: -1 })
-      .select(["name", "walletAmount", "mobile"]);
+      .select(["_id", "name", "walletAmount", "mobile"]);
+    console.log("Baby Ki Gaand", leaderboardUsers[0]);
 
+    let leaderboardUsers2 = [];
+    for (let i = 0; i < leaderboardUsers.length; i++) {
+      let transaction = await Transaction.findOne({
+        userID: leaderboardUsers[i]._id.toString(),
+      });
+      console.log(transaction);
+      if (transaction) {
+        leaderboardUsers2.push(leaderboardUsers[i]);
+      }
+    }
+    // leaderboardUsers.filter(async (e) => {
+    //   let transaction = await Transaction.findOne({ userID: e._id.toString() });
+
+    //   if (transaction) {
+    //     return e;
+    //   }
+    // });
+    console.log("Baby Ka Loda", leaderboardUsers[0]);
     let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
 
-    leaderboardUsers = leaderboardUsers.filter((a, i) => {
+    let top10 = leaderboardUsers2.filter((a, i) => {
       if (i <= 9) {
         return a;
       }
     });
 
-    // const transaction = await Transaction.find().select("name");
-
-    return res.send({ leaderboardUsers, rank });
+    return res.send({ leaderboardUsers: top10, rank });
   } catch (ex) {
     console.log(ex);
     res.send({ message: "Internal Server Error" });
