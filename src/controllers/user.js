@@ -116,7 +116,7 @@ exports.category = async (req, res) => {
 
 exports.singleCompany = async (req, res) => {
   try {
-    let company = Company.findOne({ _id: req.body.Company_id }).select([
+    let company = await Company.findById(req.body.Company_id).select([
       "name",
       "shareValue",
       "shareCount",
