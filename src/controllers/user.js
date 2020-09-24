@@ -176,9 +176,9 @@ exports.leaderboard = async (req, res) => {
     console.log("Baby Ki Gaand", leaderboardUsers[0]);
 
     leaderboardUsers = leaderboardUsers.filter(async (e) => {
-      let transaction = await Transaction.findOne({ userID: e._id });
+      let transaction = await Transaction.findOne({ userID: e._id.toString() });
 
-      if (transaction !== null) {
+      if (transaction) {
         return e;
       }
     });
