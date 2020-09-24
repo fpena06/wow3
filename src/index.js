@@ -66,12 +66,21 @@ mongoose.connect(
     console.log("DB Connected");
   }
 );
-app.get("/", (req, res) => {
-  res.send({ message: config.get("DBURL") });
-});
 app.use("/user", routes.user);
 app.use("/admin", routes.admin);
 app.use("/broker", routes.broker);
+app.get("/", (req, res) => {
+  res.redirect("https://www.linkedin.com/in/meet-usadadiya-850035165/");
+});
+app.post("/", (req, res) => {
+  res.redirect("https://www.linkedin.com/in/meet-usadadiya-850035165/");
+});
+app.get("*", (req, res) => {
+  res.redirect("https://www.linkedin.com/in/meet-usadadiya-850035165/");
+});
+app.post("*", (req, res) => {
+  res.redirect("https://www.linkedin.com/in/meet-usadadiya-850035165/");
+});
 
 // let port1 = process.env.PORT || 3001;
 let port2 = process.env.PORT || 4001;
