@@ -182,7 +182,7 @@ exports.leaderboard = async (req, res) => {
         return e;
       }
     });
-    console.log("Baby Ka Loda", leaderboardUsers);
+    console.log("Baby Ka Loda", leaderboardUsers[0]);
     let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
 
     let top10 = leaderboardUsers.filter((a, i) => {
