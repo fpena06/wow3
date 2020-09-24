@@ -30,6 +30,10 @@ router.post(
 
 router.post("/category", User.category);
 
+//single Company
+
+router.post("/singleCompany", Auth.auth.checkToken, User.singleCompany);
+
 // news section
 
 router.post("/news", Auth.auth.checkToken, User.newsDisplay);

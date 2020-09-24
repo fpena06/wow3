@@ -112,6 +112,23 @@ exports.category = async (req, res) => {
   }
 };
 
+//single company
+
+exports.singleCompany = async (req, res) => {
+  try {
+    let company = Company.findOne({ _id: req.body.Company_id }).select([
+      "name",
+      "shareValue",
+      "shareCount",
+      "previousValue",
+    ]);
+    res.send({ company });
+  } catch (ex) {
+    console.log(ex);
+    res.send({ message: "Internal Server Error" });
+  }
+};
+
 //user dashboard after selecting category
 
 exports.dashboardCategory = async (req, res) => {
