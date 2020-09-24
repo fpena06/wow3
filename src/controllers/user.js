@@ -173,12 +173,16 @@ exports.leaderboard = async (req, res) => {
     let leaderboardUsers = await User.find()
       .sort({ walletAmount: -1 })
       .select(["_id", "name", "walletAmount", "mobile"]);
+    console.log("Baby Ki Gaand", leaderboardUsers[0]);
 
     leaderboardUsers = leaderboardUsers.filter(async (e) => {
       let transaction = await Transaction.findOne({ userID: e._id });
-      if (transaction !== null) return e;
-    });
 
+      if (transaction !== null) {
+        return e;
+      }
+    });
+    console.log("Baby Ka Loda", leaderboardUsers);
     let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
 
     let top10 = leaderboardUsers.filter((a, i) => {
