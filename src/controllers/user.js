@@ -177,7 +177,9 @@ exports.leaderboard = async (req, res) => {
 
     let leaderboardUsers2 = [];
     for (let i = 0; i < leaderboardUsers.length; i++) {
-      let transaction = await Transaction.findOne({ userID: e._id.toString() });
+      let transaction = await Transaction.findOne({
+        userID: leaderboardUsers[i]._id.toString(),
+      });
       console.log(transaction);
       if (transaction) {
         leaderboardUsers2.push(leaderboardUsers[i]);
