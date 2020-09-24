@@ -235,8 +235,8 @@ exports.transaction = async (req, res) => {
   let company;
   let sharePrice;
   let t;
-
-  for (let i = 0; i < userTransactions.length; i++) {
+  let len = userTransactions.length;
+  for (let i = 0; i < len; i++) {
     t = userTransactions[i];
 
     company = await Company.findById(t.companyID.toString());

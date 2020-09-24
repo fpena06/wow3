@@ -79,7 +79,8 @@ exports.dashboard = async (req, res) => {
       .limit(1)
       .select("name");
     let userShareAmount = 0;
-    for (let i = 0; i < user.currentHoldings.length; i++) {
+    let len = user.currentHoldings.length;
+    for (let i = 0; i < len; i++) {
       userShareAmount = userShareAmount + user.currentHoldings[i].shareAmount;
     }
     const leaderboardTop = await User.find()
@@ -171,12 +172,18 @@ exports.leaderboard = async (req, res) => {
     );
     const leaderboardUsers = await User.find()
       .sort({ walletAmount: -1 })
-      .select(["name", "walletAmount", "mobile"])
-      .limit(10);
-
-    const transaction = await Transaction.find().select("name");
+      .select(["name", "walletAmount", "mobile"]);
 
     let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
+
+    leaderboardUsers = leaderboardUsers.filter((a, i) => {
+      if (i <= 9) {
+        return a;
+      }
+    });
+
+    // const transaction = await Transaction.find().select("name");
+
     return res.send({ leaderboardUsers, rank });
   } catch (ex) {
     console.log(ex);
@@ -198,8 +205,8 @@ exports.transaction = async (req, res) => {
     let sharePrice;
     let t;
     let c;
-
-    for (let i = 0; i < userTransactions.length; i++) {
+    let len = userTransactions.length;
+    for (let i = 0; i < len; i++) {
       t = userTransactions[i];
 
       company = await Company.findById(t.companyID.toString());
@@ -216,8 +223,8 @@ exports.transaction = async (req, res) => {
     }
 
     let user = await User.findById(req.body.User_id);
-
-    for (let i = 0; i < user.currentHoldings.length; i++) {
+    let len = user.currentHoldings.length;
+    for (let i = 0; i < len; i++) {
       c = user.currentHoldings[i];
       company = await Company.findById(c.Company_id.toString());
 
@@ -496,7 +503,8 @@ exports.watchlist = async (req, res) => {
       User_id: user._id,
     });
     let userWatchlist1 = [];
-    for (let i = 0; i < userWatchlist.length; i++) {
+    let len = userWatchlist.length;
+    for (let i = 0; i < len; i++) {
       let c = await Company.findById(userWatchlist[i].Company_id);
       const shareValueChange =
         c.shareValue - c.previousValue[c.previousValue.length - 1].value;
