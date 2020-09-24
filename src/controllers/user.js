@@ -223,8 +223,8 @@ exports.transaction = async (req, res) => {
     }
 
     let user = await User.findById(req.body.User_id);
-    let len = user.currentHoldings.length;
-    for (let i = 0; i < len; i++) {
+    let len1 = user.currentHoldings.length;
+    for (let i = 0; i < len1; i++) {
       c = user.currentHoldings[i];
       company = await Company.findById(c.Company_id.toString());
 
