@@ -175,17 +175,25 @@ exports.leaderboard = async (req, res) => {
       .select(["_id", "name", "walletAmount", "mobile"]);
     console.log("Baby Ki Gaand", leaderboardUsers[0]);
 
-    leaderboardUsers = leaderboardUsers.filter(async (e) => {
+    let leaderboardUsers2 = [];
+    for (let i = 0; i < leaderboardUsers.length; i++) {
       let transaction = await Transaction.findOne({ userID: e._id.toString() });
-
+      console.log(transaction);
       if (transaction) {
-        return e;
+        leaderboardUsers2.push(leaderboardUsers[i]);
       }
-    });
+    }
+    // leaderboardUsers.filter(async (e) => {
+    //   let transaction = await Transaction.findOne({ userID: e._id.toString() });
+
+    //   if (transaction) {
+    //     return e;
+    //   }
+    // });
     console.log("Baby Ka Loda", leaderboardUsers[0]);
     let rank = leaderboardUsers.findIndex((p) => p.mobile === user.mobile) + 1;
 
-    let top10 = leaderboardUsers.filter((a, i) => {
+    let top10 = leaderboardUsers2.filter((a, i) => {
       if (i <= 9) {
         return a;
       }
