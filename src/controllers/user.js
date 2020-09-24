@@ -116,13 +116,32 @@ exports.category = async (req, res) => {
 
 exports.singleCompany = async (req, res) => {
   try {
-    let company = await Company.findById(req.body.Company_id).select([
+    let decoded = await jwt.decode(
+      req.headers["x-access-token"],
+      config.get("TOKEN")
+    );
+    const company1 = await Company.findById(req.body.Company_id).select([
       "name",
       "shareValue",
       "shareCount",
       "previousValue",
     ]);
-    res.send({ company });
+
+    const user = await User.findOne({ mobile: decoded.mobile });
+    const userCurrentHoldings = user.currentHoldings;
+
+    let foundCompany = userCurrentHoldings.find(
+      (p) => p.Company_id.toString() == company1._id.toString()
+    );
+    let company = {
+      _id: company._id,
+      name: company.name,
+      shareValue: company.shareValue,
+      shareCount: company.shareCount,
+      previousValue: company.previousValue,
+      boughtVolume: foundCompany ? foundCompany.shareCount : 0,
+    };
+    return res.send({ company });
   } catch (ex) {
     console.log(ex);
     res.send({ message: "Internal Server Error" });
