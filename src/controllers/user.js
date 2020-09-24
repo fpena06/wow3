@@ -134,11 +134,11 @@ exports.singleCompany = async (req, res) => {
       (p) => p.Company_id.toString() == company1._id.toString()
     );
     let company = {
-      _id: company._id,
-      name: company.name,
-      shareValue: company.shareValue,
-      shareCount: company.shareCount,
-      previousValue: company.previousValue,
+      _id: company1._id,
+      name: company1.name,
+      shareValue: company1.shareValue,
+      shareCount: company1.shareCount,
+      previousValue: company1.previousValue,
       boughtVolume: foundCompany ? foundCompany.shareCount : 0,
     };
     return res.send({ company });
