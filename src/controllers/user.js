@@ -214,6 +214,7 @@ exports.transaction = async (req, res) => {
     let t;
     let c;
     let len = userTransactions.length;
+
     for (let i = 0; i < len; i++) {
       t = userTransactions[i];
 
