@@ -5,7 +5,7 @@ const UserSchema = mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   mobile: { type: String, required: true, unique: true },
-  walletAmount: { type: Number, default: 100000 },
+  walletAmount: { type: Number, default: 150000 },
   currentHoldings: [
     {
       Company_id: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
