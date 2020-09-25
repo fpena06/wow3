@@ -220,7 +220,7 @@ exports.leaderboard = async (req, res) => {
   try {
     let leaderboardUsers = await User.find()
       .sort({ walletAmount: -1 })
-      .select(["_id", "name", "walletAmount", "mobile"]);
+      .select(["_id", "name", "walletAmount", "mobile", "email"]);
 
     let leaderboardUsers2 = [];
     let len = leaderboardUsers.length;
