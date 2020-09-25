@@ -233,7 +233,7 @@ exports.leaderboard = async (req, res) => {
         leaderboardUsers2.push(leaderboardUsers[i]);
       }
     }
-    return res.send({ leaderboardUsers2 });
+    return res.send(leaderboardUsers2);
   } catch (ex) {
     console.log(ex);
     res.send({ message: "Internal Server Error" });
