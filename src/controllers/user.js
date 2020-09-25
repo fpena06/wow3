@@ -369,7 +369,6 @@ exports.sellShares = async (req, res) => {
     const company = await Company.findById(req.body.Company_id)
       .select(["shareValue", "shareCount"])
       .lean();
-    console.log(company);
     const companyShareValue = company.shareValue;
     const companyShareCount = company.shareCount;
     const userShareCount = req.body.shareCount;
