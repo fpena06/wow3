@@ -211,7 +211,8 @@ exports.leaderboard = async (req, res) => {
       .select(["_id", "name", "walletAmount", "mobile"]);
 
     let leaderboardUsers2 = [];
-    for (let i = 0; i < leaderboardUsers.length; i++) {
+    let len = leaderboardUsers.length;
+    for (let i = 0; i < len; i++) {
       let transaction = await Transaction.findOne({
         userID: leaderboardUsers[i]._id.toString(),
       });

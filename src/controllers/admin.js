@@ -217,11 +217,27 @@ exports.newsDisplay = async (req, res) => {
 // leaderboard
 
 exports.leaderboard = async (req, res) => {
-  const leaderboardUsers = await User.find()
-    .sort({ walletAmount: -1 })
-    .select(["name", "walletAmount", "mobile"])
-    .limit(80);
-  return res.send(leaderboardUsers);
+  try {
+    let leaderboardUsers = await User.find()
+      .sort({ walletAmount: -1 })
+      .select(["_id", "name", "walletAmount", "mobile"]);
+
+    let leaderboardUsers2 = [];
+    let len = leaderboardUsers.length;
+    for (let i = 0; i < len; i++) {
+      let transaction = await Transaction.findOne({
+        userID: leaderboardUsers[i]._id.toString(),
+      });
+      console.log(transaction);
+      if (transaction) {
+        leaderboardUsers2.push(leaderboardUsers[i]);
+      }
+    }
+    return res.send({ leaderboardUsers: leaderboardUsers2 });
+  } catch (ex) {
+    console.log(ex);
+    res.send({ message: "Internal Server Error" });
+  }
 };
 
 // transaction
