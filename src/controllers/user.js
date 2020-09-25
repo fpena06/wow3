@@ -293,6 +293,9 @@ exports.transaction = async (req, res) => {
 
 exports.buyShares = async (req, res) => {
   try {
+    if (req.body.shareCount < 0) {
+      return res.send({ message: "Enter Vaid number of Shares" });
+    }
     const user = await User.findById(req.body.User_id)
       .select(["walletAmount", "currentHoldings"])
       .lean();
@@ -396,6 +399,9 @@ exports.buyShares = async (req, res) => {
 
 exports.sellShares = async (req, res) => {
   try {
+    if (req.body.shareCount < 0) {
+      return res.send({ message: "Enter Vaid number of Shares" });
+    }
     const user = await User.findById(req.body.User_id)
       .select(["walletAmount", "currentHoldings"])
       .lean();
